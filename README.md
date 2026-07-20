@@ -1,15 +1,34 @@
-# MFSEssentials — FreeScout Editor Quality-of-Life Module
+# MFSEssentials — FreeScout Editor Upgrade for Replies and Notes Module
 
 **Module alias:** `mfsessentials`
 **Version:** 1.1.1
 **GitHub:** https://github.com/ManagedFreeScout/mfsessentials
 **Namespace:** `Modules\MFSEssentials`
 
-Standalone module, unrelated to CfsAssist (AI features) or MSTeamsFS (Teams
+Standalone module, unrelated to other Managed FreeScout modules, like CfsAssist (AI features) or MSTeamsFS (Teams
 SSO). No licensing, no settings page. On the GitHub auto-update pipeline as of v1.1.1
 (see Distribution section below).
 
 ---
+**Summary - What it does**
+
+😊 **Emoji & special character picker**
+A toolbar button in both the Reply and Note editors that lets you insert emoji and special characters (currency symbols, arrows, typographic dashes, and more) directly into your text — works the same whether you're writing an internal note or a reply that goes straight to a customer.
+
+👍 **Reactions on internal Notes**
+React to a colleague's internal note the way you would in Slack or Teams — 👍 ✅ 👀 🎉. See who reacted by hovering over a reaction. Reactions only ever appear on internal Notes, never on customer-facing replies.
+
+🔧 **Fixed: "Code" formatting no longer breaks the layout**
+FreeScout's built-in "Code" text style previously forced a horizontal scrollbar on long lines instead of wrapping (a known, yet unresolved FreeScout issue, see below Part 0). Fixed.
+
+**Some screenshots:**
+
+<img width="1328" height="303" alt="image" src="https://github.com/user-attachments/assets/8125a498-360e-48a0-8cbc-781868f3f66b" />
+
+<img width="1203" height="282" alt="image" src="https://github.com/user-attachments/assets/cbdf58b7-56bd-4a0c-af53-dac6b3d841ba" />
+
+<img width="1160" height="313" alt="image" src="https://github.com/user-attachments/assets/128de134-91a3-44c0-97ca-e995621c21f5" />
+
 
 ## What's in v1
 
