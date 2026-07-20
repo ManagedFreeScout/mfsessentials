@@ -5,7 +5,7 @@
 **GitHub:** https://github.com/ManagedFreeScout/mfsessentials
 **Namespace:** `Modules\MFSEssentials`
 
-Standalone module, unrelated to CfsAssist (AI features) or MSTeamsFS/MSTeamsSso (Teams
+Standalone module, unrelated to CfsAssist (AI features) or MSTeamsFS (Teams
 SSO). No licensing, no settings page. On the GitHub auto-update pipeline as of v1.1.1
 (see Distribution section below).
 
@@ -84,7 +84,7 @@ MFSEssentials/
 
 ## Distribution
 
-On the GitHub-based auto-update pipeline as of v1.1.1, same mechanism as MSTeamsFS/MSTeamsSso:
+On the GitHub-based auto-update pipeline as of v1.1.1, same mechanism as MSTeamsFS:
 - Repo: https://github.com/ManagedFreeScout/mfsessentials (public, one repo per module)
 - `module.json` carries `latestVersionUrl` (points to `version.txt` on `main`) and
   `latestVersionZipUrl` (points to the latest GitHub Release's `mfsessentials.zip` asset)
