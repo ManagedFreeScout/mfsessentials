@@ -30,15 +30,15 @@ FreeScout's built-in "Code" text style previously forced a horizontal scrollbar 
 <img width="1160" height="313" alt="image" src="https://github.com/user-attachments/assets/128de134-91a3-44c0-97ca-e995621c21f5" />
 
 ## How to Install
-Download the latest mfsessentials.zip from the Releases page.
-Using FTP, SFTP, or your hosting control panel's file manager, upload and extract the zip into your FreeScout installation's Modules/ folder, so the files land at Modules/MFSEssentials/ (not nested inside another MFSEssentials/ folder).
-In FreeScout, go to Manage → Modules, find MFSEssentials, and click Activate.
-That's it — no configuration, no license key, no settings page. The emoji/symbol button appears immediately in your Reply and Note editors, and the reaction bar appears on internal Notes.
-Updates
+1. Download the latest mfsessentials.zip from the Releases page.
+2. Using FTP, SFTP, or your hosting control panel's file manager, upload and extract the zip into your FreeScout installation's Modules/ folder, so the files land at Modules/MFSEssentials/ (not nested inside another MFSEssentials/ folder).
+3. In FreeScout, go to Manage → Modules, find MFSEssentials, and click Activate.
+4. That's it — no configuration, no license key, no settings page. The emoji/symbol button appears immediately in your Reply and Note editors, and the reaction bar appears on internal Notes.
 
+**Updates**
 Once installed, FreeScout will automatically show an "Update available" notice on the Manage → Modules page whenever a new version is released — just click Update Now. No manual re-upload needed for future versions.
 
-
+---
 ## What's in v1
 
 ### Part 0 — Code-block wrap fix
