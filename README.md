@@ -23,7 +23,7 @@ FreeScout's built-in "Code" text style previously forced a horizontal scrollbar 
 
 **Some screenshots:**
 
-<img width="1328" height="303" alt="image" src="https://github.com/user-attachments/assets/8125a498-360e-48a0-8cbc-781868f3f66b" />
+<img width="1338" height="465" alt="image" src="https://github.com/user-attachments/assets/87c78d60-5c1a-47e9-9dcd-6ee29b1bdc2f" />
 
 <img width="1203" height="282" alt="image" src="https://github.com/user-attachments/assets/cbdf58b7-56bd-4a0c-af53-dac6b3d841ba" />
 
