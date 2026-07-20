@@ -10,7 +10,7 @@ SSO). No licensing, no settings page. On the GitHub auto-update pipeline as of v
 (see Distribution section below).
 
 ---
-**Summary - What it does**
+## Summary - What it does
 
 😊 **Emoji & special character picker**
 A toolbar button in both the Reply and Note editors that lets you insert emoji and special characters (currency symbols, arrows, typographic dashes, and more) directly into your text — works the same whether you're writing an internal note or a reply that goes straight to a customer.
@@ -28,6 +28,15 @@ FreeScout's built-in "Code" text style previously forced a horizontal scrollbar 
 <img width="1203" height="282" alt="image" src="https://github.com/user-attachments/assets/cbdf58b7-56bd-4a0c-af53-dac6b3d841ba" />
 
 <img width="1160" height="313" alt="image" src="https://github.com/user-attachments/assets/128de134-91a3-44c0-97ca-e995621c21f5" />
+
+## How to Install
+Download the latest mfsessentials.zip from the Releases page.
+Using FTP, SFTP, or your hosting control panel's file manager, upload and extract the zip into your FreeScout installation's Modules/ folder, so the files land at Modules/MFSEssentials/ (not nested inside another MFSEssentials/ folder).
+In FreeScout, go to Manage → Modules, find MFSEssentials, and click Activate.
+That's it — no configuration, no license key, no settings page. The emoji/symbol button appears immediately in your Reply and Note editors, and the reaction bar appears on internal Notes.
+Updates
+
+Once installed, FreeScout will automatically show an "Update available" notice on the Manage → Modules page whenever a new version is released — just click Update Now. No manual re-upload needed for future versions.
 
 
 ## What's in v1
