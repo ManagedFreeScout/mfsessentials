@@ -1,0 +1,149 @@
+/* MFSEssentials — module.css */
+
+/* ---------------------------------------------------------------------
+ * PART 0 — Code-block wrap fix
+ *
+ * Confirmed against the exact vendored Summernote source (1.8.223 install):
+ * the editor's "Code" style option (summernote.js styleTags default array,
+ * lang.style.pre = "Code") applies via editor.formatBlock('PRE') — a plain
+ * <pre> tag, no extra class. Summernote's own bundled CSS only pads
+ * ".note-style .dropdown-style pre" (dead — FreeScout's configured toolbars
+ * never add the literal "style" button), so a real inserted <pre> has no
+ * wrapping rule anywhere: not in the live editor (.note-editable) and not in
+ * the rendered conversation (.thread-body, confirmed in
+ * resources/views/conversations/partials/thread.blade.php).
+ * Ref: https://github.com/freescout-help-desk/freescout/issues/5167
+ * ------------------------------------------------------------------- */
+.note-editable pre,
+.thread-body pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ---------------------------------------------------------------------
+ * PART 1 — Emoji / Special Character toolbar button
+ * ------------------------------------------------------------------- */
+.mfsessentials-picker-panel {
+    display: none;
+    position: absolute;
+    z-index: 1060;
+    top: 100%;
+    left: 0;
+    width: 320px;
+    max-height: 280px;
+    margin-top: 2px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 3px 9px rgba(0, 0, 0, .2);
+    overflow: hidden;
+}
+
+.mfsessentials-picker-panel.open {
+    display: block;
+}
+
+.mfsessentials-picker-tabs {
+    display: flex;
+    border-bottom: 1px solid #eee;
+}
+
+.mfsessentials-picker-tab {
+    flex: 1;
+    padding: 6px 8px;
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+    background: #f7f7f7;
+    border-right: 1px solid #eee;
+}
+
+.mfsessentials-picker-tab:last-child {
+    border-right: none;
+}
+
+.mfsessentials-picker-tab.active {
+    background: #fff;
+    font-weight: bold;
+}
+
+.mfsessentials-picker-body {
+    max-height: 230px;
+    overflow-y: auto;
+    padding: 6px;
+}
+
+.mfsessentials-picker-category {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    margin: 6px 2px 3px;
+}
+
+.mfsessentials-picker-category:first-child {
+    margin-top: 2px;
+}
+
+.mfsessentials-picker-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.mfsessentials-picker-item {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.mfsessentials-picker-item:hover {
+    background: #eef3fb;
+}
+
+/* ---------------------------------------------------------------------
+ * PART 2 — Note reactions bar
+ * ------------------------------------------------------------------- */
+.mfsessentials-reactions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.mfsessentials-reaction {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.mfsessentials-reaction:hover {
+    background: #eef3fb;
+    border-color: #b8d0ee;
+}
+
+.mfsessentials-reaction.active {
+    background: #dceafe;
+    border-color: #6ea8f0;
+}
+
+.mfsessentials-reaction .mfsessentials-reaction-count {
+    font-size: 12px;
+    color: #555;
+}
+
+.mfsessentials-reaction.active .mfsessentials-reaction-count {
+    color: #1a56ad;
+    font-weight: bold;
+}

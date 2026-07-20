@@ -1,0 +1,21 @@
+{
+    "name": "MFSEssentials",
+    "alias": "mfsessentials",
+    "description": "FreeScout editor quality-of-life features: code-block wrap fix, emoji/symbol insertion, and note reactions.",
+    "version": "1.1.1",
+    "author": "StackPros",
+    "keywords": [],
+    "active": 1,
+    "order": 0,
+    "providers": [
+        "Modules\\MFSEssentials\\Providers\\MFSEssentialsServiceProvider"
+    ],
+    "authorUrl": "https://managedfreescout.com",
+    "aliases": {},
+    "files": [
+        "start.php"
+    ],
+    "requires": [],
+    "latestVersionUrl": "https://raw.githubusercontent.com/ManagedFreeScout/mfsessentials/main/version.txt",
+    "latestVersionZipUrl": "https://github.com/ManagedFreeScout/mfsessentials/releases/latest/download/mfsessentials.zip"
+}

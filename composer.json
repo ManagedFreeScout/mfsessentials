@@ -1,0 +1,27 @@
+{
+  "name": "stackpros/freescout-mfsessentials",
+  "description": "FreeScout module — editor quality-of-life features (code-block wrap fix, emoji/symbols insertion, note reactions).",
+  "authors": [
+    {
+      "name": "StackPros",
+      "email": "support@stackpros.io"
+    }
+  ],
+  "type": "library",
+  "require": {
+    "php": ">=7.2"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Modules\\MFSEssentials\\Providers\\MFSEssentialsServiceProvider"
+      ],
+      "aliases": {}
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Modules\\MFSEssentials\\": ""
+    }
+  }
+}
