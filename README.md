@@ -18,6 +18,9 @@ A toolbar button in both the Reply and Note editors that lets you insert emoji a
 👍 **Reactions on internal Notes**
 React to a colleague's internal note the way you would in Slack or Teams — 👍 ✅ 👀 🎉. See who reacted by hovering over a reaction. Reactions only ever appear on internal Notes, never on customer-facing replies.
 
+🙈 **Convert an email to an internal note (and back)**
+Forwarded internal emails sometimes land in a conversation and would then show up for the client in the quoted history of later replies and in the customer portal. Choose **Convert to note** in that email's menu (top right) and it becomes an internal note: clients no longer see it anywhere, while its text, attachments and place in the conversation stay. A banner shows who converted it and who originally sent it, and **Convert back to email** undoes it. Once converted, you can also delete it like any of your own notes.
+
 🔧 **Fixed: "Code" formatting no longer breaks the layout**
 FreeScout's built-in "Code" text style previously forced a horizontal scrollbar on long lines instead of wrapping (a known, yet unresolved FreeScout issue, see below Part 0). Fixed.
 
@@ -89,6 +92,33 @@ collation weights above U+FFFF and treats all supplementary-plane emoji as equal
 `=` — see the `2026_07_21_...` migration for the full story and hard evidence. Never
 "fix" this by changing the column back to the table-wide default collation.
 
+### Part 3 — Convert an email to a note (v1.2.0, board card freescout-modules #261)
+Feature request: https://feedback.userreport.com/25a3cb5f-e4bd-4470-b6f3-79fcfaa8e90f/#idea/452667
+
+Clients only ever see threads of type CUSTOMER and MESSAGE: the quoted history in reply
+emails (`app/Jobs/SendReplyToCustomer.php`) and the End User Portal
+(`Conversation::getReplies()`) both filter on those two types. So the thread's type is
+changed to NOTE **in place**: text, attachments, date, order and message-id stay as they are.
+
+- **Menu:** `thread.menu` hook (same as TicketTranslator's "Translate") adds **Convert to note**
+  on published customer emails and agent replies, and **Convert back to email** on converted
+  notes. Confirmation via core's `showModalConfirm`, request via `fsAjax()` to
+  `POST /mfsessentials/thread/convert` (`Http/Controllers/ConvertController.php`), then reload.
+- **Who:** every agent with access to the conversation's mailbox (admins always), same access
+  rule as core (`userHasAccessToMailbox` + `ThreadPolicy::checkIsOnlyAssigned`).
+- **Warnings in the confirmation:** agent replies were already sent and cannot be recalled;
+  converting the first message of a conversation is allowed but flagged.
+- **Author:** core renders a note's author from `created_by_user`, so the converting agent
+  becomes the author (this also gives them core's Delete on it). Original type, author and
+  `source_via` are kept in thread meta `mfse_converted`, shown in a banner
+  (`thread.before_body`) and restored by Convert back.
+- **Activity lines:** line items with action types 231 (to note) and 232 (back to email),
+  texts via the `thread.action_text` filter. (`threads.action_type` is a tinyint; core uses
+  1–11, SpamFilter 101, Workflows 201.)
+- **Reports** that count customer messages count one fewer for a converted email.
+- Code: `Services/ThreadConverter.php`, `Public/js/mfsessentials-convert.js`,
+  `Resources/views/partials/convert-banner.blade.php`, banner CSS in `module.css`.
+
 ## Files
 
 ```
@@ -98,16 +128,18 @@ MFSEssentials/
 ├── start.php                                   Loads routes
 ├── Providers/MFSEssentialsServiceProvider.php  stylesheets/javascripts registration, migrations, thread.meta hook
 ├── Http/
-│   ├── routes.php                              POST /mfsessentials/reactions/toggle
-│   └── Controllers/ReactionsController.php
+│   ├── routes.php                              POST /mfsessentials/reactions/toggle, POST /mfsessentials/thread/convert
+│   └── Controllers/ReactionsController.php, ConvertController.php
+├── Services/ThreadConverter.php                Part 3 — convert to note / back, banner data, action types
 ├── Entities/ThreadReaction.php                 ALLOWED_EMOJI, toggle(), summaryFor()
 ├── Database/Migrations/..._create_mfsessentials_thread_reactions_table.php
 ├── Public/
 │   ├── css/module.css                          Part 0 fix + Part 1 picker + Part 2 bar styling
 │   └── js/
 │       ├── mfsessentials-editor.js             Part 1 — emoji/symbol picker
-│       └── mfsessentials-reactions.js          Part 2 — reaction bar click handling
-└── Resources/views/partials/reactions-bar.blade.php
+│       ├── mfsessentials-reactions.js          Part 2 — reaction bar click handling
+│       └── mfsessentials-convert.js            Part 3 — convert menu items
+└── Resources/views/partials/reactions-bar.blade.php, convert-banner.blade.php
 ```
 
 ## Distribution

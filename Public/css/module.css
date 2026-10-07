@@ -147,3 +147,16 @@
     color: #1a56ad;
     font-weight: bold;
 }
+
+/* Part 3 — banner on an email converted to a note (card freescout-modules #261) */
+.mfsessentials-converted-banner {
+    margin: 0 0 10px 0;
+    padding: 6px 10px;
+    border-left: 3px solid #e6a23c;
+    background: rgba(230, 162, 60, 0.08);
+    color: #72777f;
+    font-size: 12px;
+}
+.mfsessentials-converted-banner .glyphicon {
+    margin-right: 4px;
+}

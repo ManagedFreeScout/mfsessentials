@@ -1,7 +1,7 @@
 {
   "name": "MFSEssentials",
   "alias": "mfsessentials",
-  "description": "FreeScout editor quality-of-life features: code-block wrap fix, emoji/symbol insertion, and note reactions.",
+  "description": "FreeScout editor quality-of-life features: code-block wrap fix, emoji/symbol insertion, note reactions, and converting an email to an internal note.",
   "version": "1.1.2",
   "author": "StackPros",
   "keywords": [],
