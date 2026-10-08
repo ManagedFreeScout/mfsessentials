@@ -6,7 +6,8 @@
 **Namespace:** `Modules\MFSEssentials`
 
 Standalone module, unrelated to other Managed FreeScout modules, like CfsAssist (AI features) or MSTeamsFS (Teams
-SSO). No licensing, no settings page. On the GitHub auto-update pipeline as of v1.1.1
+SSO). From v1.3.0 it needs a licence (yearly subscription, €9, one FreeScout installation, all agents);
+buy it on https://managedfreescout.com/mfsessentials/. On the GitHub auto-update pipeline as of v1.1.1
 (see Distribution section below).
 
 ---
@@ -36,7 +37,7 @@ FreeScout's built-in "Code" text style previously forced a horizontal scrollbar 
 1. Download the latest mfsessentials.zip from the Releases page.
 2. Using FTP, SFTP, or your hosting control panel's file manager, upload and extract the zip into your FreeScout installation's Modules/ folder, so the files land at Modules/MFSEssentials/ (not nested inside another MFSEssentials/ folder).
 3. In FreeScout, go to Manage → Modules, find MFSEssentials, and click Activate.
-4. That's it — no configuration, no license key, no settings page. The emoji/symbol button appears immediately in your Reply and Note editors, and the reaction bar appears on internal Notes.
+4. Go to Manage → Settings → MFSEssentials, enter your licence key and click Activate licence. You find the key in your customer account (linked in the email you received after your purchase). All features switch on right away: Convert to note in each email's menu, the reaction bar on internal notes, the emoji/symbol button in the Reply and Note editors, and wrapping code blocks.
 
 **Updates**
 Once installed, FreeScout will automatically show an "Update available" notice on the Manage → Modules page whenever a new version is released — just click Update Now. No manual re-upload needed for future versions.
@@ -119,6 +120,31 @@ changed to NOTE **in place**: text, attachments, date, order and message-id stay
 - Code: `Services/ThreadConverter.php`, `Public/js/mfsessentials-convert.js`,
   `Resources/views/partials/convert-banner.blade.php`, banner CSS in `module.css`.
 
+### Part 4 — Licence (v1.3.0, board card freescout-modules #194)
+Decisions (Rutger, 8 Oct 2026): €9 per year (invAIse PROD activity 13 "MFS Essentials"); no licence,
+an expired subscription, or no successful licence check for 14 days = **every** feature off, also
+right after updating from a free version (no grace period).
+
+- **No secrets in the module.** The module never calls invAIse itself: it posts only the licence
+  key and this installation's domain (host of `app.url`) to the Managed FreeScout hub,
+  `POST {hub_url}/modules/mfsessentials/license/{activate|validate|deactivate}`. The hub calls
+  invAIse with its own credentials, limited to the MFSEssentials activity (`activity_ids`), and
+  passes the answer through. Same idea as MSTeamsFS's `/teams/license` (msteamsfs cards #268, #285).
+  `hub_url` defaults to https://app.managedfreescout.com (`MFSESSENTIALS_HUB_URL` to override).
+- **Storage:** the shared `modules_licenses` table (`module_alias = mfsessentials`). This module has its
+  own guarded migration for it, so it works without MSTeamsFS or StickyMenu installed.
+- **Gate:** `LicenseService::isLicensed()` (local read, cached per request). Checked by the CSS/JS
+  registration (so the code-block fix is off too), the reactions bar and the convert menu/banner
+  hooks, and server-side in ReactionsController and ConvertController. The activity-line text
+  filter stays on, so existing "converted" lines keep their wording.
+- **Checks:** activate is followed by a validate (invAIse's activate answer has no expiry date);
+  re-validated every 6 hours by the scheduler; an unreachable hub/invAIse leaves the stored state as
+  it is, and the 14-day staleness backstop (`MAX_STALE_DAYS`) switches the features off if checks
+  keep failing. Every successful check touches `updated_at`, also when nothing changed (MSTeamsFS #258).
+- **Settings page:** Manage → Settings → MFSEssentials: status (active / expired / not activated /
+  in use elsewhere / not checked for 14 days), paid-until date, last check, buy/renew link, licence key
+  with Activate / Deactivate. FreeScout's Manage → Modules page shows the licence too.
+
 ## Files
 
 ```
@@ -131,6 +157,11 @@ MFSEssentials/
 │   ├── routes.php                              POST /mfsessentials/reactions/toggle, POST /mfsessentials/thread/convert
 │   └── Controllers/ReactionsController.php, ConvertController.php
 ├── Services/ThreadConverter.php                Part 3 — convert to note / back, banner data, action types
+├── Services/LicenseService.php                 Part 4 — licence via the hub, isLicensed() gate
+├── Models/MFSEssentialsLicense.php             Part 4 — modules_licenses row (module_alias mfsessentials), 14-day backstop
+├── Config/config.php                           Part 4 — hub_url, buy_url, terms_url
+├── Http/Controllers/MFSEssentialsController.php Part 4 — settings-page licence actions (admin)
+├── Resources/views/settings/                   Part 4 — settings section + licence panel
 ├── Entities/ThreadReaction.php                 ALLOWED_EMOJI, toggle(), summaryFor()
 ├── Database/Migrations/..._create_mfsessentials_thread_reactions_table.php
 ├── Public/

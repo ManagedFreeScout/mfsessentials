@@ -6,6 +6,7 @@ use App\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Modules\MFSEssentials\Services\LicenseService;
 use Modules\MFSEssentials\Services\ThreadConverter;
 
 class ConvertController extends Controller
@@ -16,6 +17,11 @@ class ConvertController extends Controller
      */
     public function convert(Request $request)
     {
+        // Licence gate (card #194), server-side too, not only by hiding the menu item.
+        if (!LicenseService::isLicensed()) {
+            return response()->json(['status' => 'error', 'msg' => __('MFSEssentials has no active licence.')]);
+        }
+
         $thread = Thread::find((int) $request->input('thread_id'));
         if (!$thread) {
             return response()->json(['status' => 'error', 'msg' => __('Thread not found')]);

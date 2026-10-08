@@ -6,11 +6,19 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\MFSEssentials\Entities\ThreadReaction;
+use Modules\MFSEssentials\Services\LicenseService;
 
 class ReactionsController extends Controller
 {
     public function toggle(Request $request)
     {
+        // Card #194: server-side gate, not just the bar being unrendered
+        // client-side -- never trust that alone, same discipline the
+        // isNote() check below already follows.
+        if (!LicenseService::isLicensed()) {
+            return response()->json(['error' => 'not_licensed'], 403);
+        }
+
         $threadId = (int) $request->input('thread_id');
         $emoji    = (string) $request->input('emoji', '');
 
