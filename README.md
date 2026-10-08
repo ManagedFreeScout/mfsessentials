@@ -1,7 +1,7 @@
 # MFSEssentials — FreeScout Editor Upgrade for Replies and Notes Module
 
 **Module alias:** `mfsessentials`
-**Version:** 1.2.0
+**Version:** 1.3.0
 **GitHub:** https://github.com/ManagedFreeScout/mfsessentials
 **Namespace:** `Modules\MFSEssentials`
 
