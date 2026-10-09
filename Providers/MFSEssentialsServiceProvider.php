@@ -101,7 +101,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
 
         // Re-check every 6 hours (same interval as MSTeamsFS, card #232 F5), so an expired or
         // revoked subscription switches the features off without anyone opening the settings.
-        \Eventy::addAction('schedule', function ($schedule) {
+        \Eventy::addFilter('schedule', function ($schedule) {
             $schedule->call(function () {
                 $service = app(LicenseService::class);
                 $status  = $service->getLicenseStatus();
@@ -109,6 +109,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
                     $service->validateLicense($status['license_key']);
                 }
             })->cron('0 */6 * * *');
+            return $schedule;
         }, 20, 1);
     }
 
