@@ -51,10 +51,10 @@ class MFSEssentialsServiceProvider extends ServiceProvider
     {
         \Eventy::addFilter('settings.sections', function ($sections) {
             $sections[self::MODULE_ALIAS] = [
-                'title'       => __('MFSEssentials'),
+                'title'       => __('MFS Essentials'),
                 'icon'        => 'lock',
                 'order'       => 310,
-                'description' => __('Licence for the MFSEssentials module.'),
+                'description' => __('Licence for the MFS Essentials module.'),
             ];
             return $sections;
         }, 15);
@@ -150,7 +150,8 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         // isNote() gate must be the first line -- same pattern already
         // proven in this project's own MSTeamsFSServiceProvider hooks.
         \Eventy::addAction('thread.meta', function ($thread, $loop, $threads, $conversation, $mailbox) {
-            if (!$thread->isNote() || !LicenseService::isLicensed()) {
+            // Not on FreeScout's print view (?print=1): a printout shows no reaction buttons (card #306).
+            if (!$thread->isNote() || request()->input('print') || !LicenseService::isLicensed()) {
                 return;
             }
 

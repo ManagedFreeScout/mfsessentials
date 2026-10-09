@@ -12,7 +12,7 @@
                 <div class="license-status-message">
                     @if($isValid)
                         <div class="alert alert-success">
-                            <i class="glyphicon glyphicon-ok"></i> {{ __('Licence is active. All MFSEssentials features are on.') }}
+                            <i class="glyphicon glyphicon-ok"></i> {{ __('Licence is active. All MFS Essentials features are on.') }}
                             @if(!empty($licenseStatus['expires_at']))
                                 {{ __('Paid until :date.', ['date' => \Carbon\Carbon::parse($licenseStatus['expires_at'])->format('j M Y')]) }}
                             @endif
@@ -23,7 +23,7 @@
                             @if(!empty($licenseStatus['message']) && ($licenseStatus['status'] ?? '') !== 'no_license')
                                 {{ $licenseStatus['message'] }}
                             @endif
-                            {{ __('MFSEssentials is switched off until a valid licence is active: convert to note, note reactions, the emoji and symbol picker and the code-block fix.') }}
+                            {{ __('MFS Essentials is switched off until a valid licence is active: convert to note, note reactions, the emoji and symbol picker and the code-block fix.') }}
                             <a href="{{ config('mfsessentials.buy_url') }}" target="_blank" rel="noopener">{{ __('Buy or renew a licence') }}</a>
                         </div>
                     @endif

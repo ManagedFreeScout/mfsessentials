@@ -1,5 +1,5 @@
 {
-  "name": "MFSEssentials",
+  "name": "MFS Essentials",
   "alias": "mfsessentials",
   "description": "FreeScout editor quality-of-life features: code-block wrap fix, emoji/symbol insertion, note reactions, and converting an email to an internal note.",
   "version": "1.3.1",

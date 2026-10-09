@@ -19,7 +19,7 @@ class ConvertController extends Controller
     {
         // Licence gate (card #194), server-side too, not only by hiding the menu item.
         if (!LicenseService::isLicensed()) {
-            return response()->json(['status' => 'error', 'msg' => __('MFSEssentials has no active licence.')]);
+            return response()->json(['status' => 'error', 'msg' => __('MFS Essentials has no active licence.')]);
         }
 
         $thread = Thread::find((int) $request->input('thread_id'));

@@ -34,7 +34,7 @@ class LicenseService
             case 'active':
                 return __('Licence is active.');
             case 'expired':
-                return __('This licence has expired. Renew your subscription to use MFSEssentials again.');
+                return __('This licence has expired. Renew your subscription to use MFS Essentials again.');
             case 'suspended':
                 return __('This licence has been suspended.');
             case 'revoked':
@@ -42,7 +42,7 @@ class LicenseService
             case 'not_activated_for_domain':
                 return __('This licence is valid but not activated for this FreeScout installation. Click Activate.');
             case 'not_found':
-                return __('Licence key not found. Check the key, and that it is a key for MFSEssentials.');
+                return __('Licence key not found. Check the key, and that it is a key for MFS Essentials.');
             case 'no_activations_left':
                 return __('This licence is already in use on another FreeScout installation. Deactivate it there first, or buy another licence.');
             case 'unreachable':
@@ -242,7 +242,7 @@ class LicenseService
                 'valid'        => $valid,
                 'status'       => $stale ? 'stale' : ($license->isExpired() ? 'expired' : $license->status),
                 'message'      => $stale
-                    ? __('The licence could not be checked for more than :days days. MFSEssentials is off until the next successful check.', ['days' => MFSEssentialsLicense::MAX_STALE_DAYS])
+                    ? __('The licence could not be checked for more than :days days. MFS Essentials is off until the next successful check.', ['days' => MFSEssentialsLicense::MAX_STALE_DAYS])
                     : $this->statusMessage($license->isExpired() ? 'expired' : (string) $license->status),
                 'license_key'  => $license->license_key,
                 'expires_at'   => $license->expires_at,
