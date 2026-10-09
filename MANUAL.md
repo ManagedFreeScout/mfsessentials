@@ -24,7 +24,7 @@ You need a self-hosted FreeScout, access to its files, and an MFSEssentials lice
 - **File access:** FTP, SFTP or your hosting panel's file manager, to place the module in FreeScout's `Modules/` folder once.
 - **Admin account** in FreeScout, to activate the module and the licence.
 - **Licence:** €9 per year (excl. VAT) for one FreeScout installation, all agents included. Buy it on [managedfreescout.com/mfsessentials](https://managedfreescout.com/mfsessentials/).
-- **Internet access from the server** to app.managedfreescout.com, for the licence check. Only the licence key and your FreeScout's domain are sent.
+- **Internet access from the server** to our licence server, for the licence check. Only the licence key and your FreeScout's domain are sent.
 
 ## Installation
 
@@ -43,7 +43,7 @@ All four features switch on the moment your licence is active, and switch off wh
 
 **Activate**
 
-1. Find your licence key in your customer account. The link is in the email you received after your purchase.
+1. Find your licence key in the confirmation email you received after your purchase. That email also explains how to manage your subscription and licence keys.
 2. In FreeScout, go to **Manage → Settings → MFSEssentials**.
 3. Paste the key and click **Activate licence**.
 
@@ -53,7 +53,7 @@ The settings page then shows the status, the date your subscription is paid unti
 
 - FreeScout re-checks the licence every 6 hours. Only the key and your FreeScout's domain are sent.
 - If the licence server cannot be reached, nothing changes. After 14 days without a successful check, the features switch off until the next successful check.
-- When your subscription ends or is not renewed, the features switch off. Renew in your customer account and they come back on the next check.
+- When your subscription ends or is not renewed, the features switch off. Renew as described in your confirmation email and they come back on the next check.
 
 **Moving to another FreeScout installation**
 
@@ -152,8 +152,8 @@ When a new version is out, **Manage → Modules** shows "Update available" next 
 | --- | --- |
 | No reactions, no smiley button, no Convert to note | Check the licence status on **Manage → Settings → MFSEssentials**. The features only work with an active licence. |
 | Status "in use elsewhere" | The key is active on another FreeScout installation. Deactivate it there first. |
-| Status "expired" | Renew your subscription in your customer account; the features return at the next check (within 6 hours), or click Activate again. |
-| Status "not checked for 14 days" | Your server cannot reach app.managedfreescout.com. Ask your host to allow outgoing HTTPS to that address. |
+| Status "expired" | Renew your subscription as described in your confirmation email; the features return at the next check (within 6 hours), or click Activate again. |
+| Status "not checked for 14 days" | Your server cannot reach our licence server. Ask your host to allow outgoing HTTPS connections from FreeScout; we can give you the exact address if they need it. |
 | No Convert to note in a menu | The option exists on client emails and on your own replies, not on notes or activity lines. A converted note shows Convert back to email instead. |
 
 Still stuck? Contact us via [managedfreescout.com/contact-us](https://managedfreescout.com/contact-us/).
