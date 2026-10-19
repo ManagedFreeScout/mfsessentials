@@ -100,7 +100,11 @@ class Features
             }
             $user_id = $user->id;
         }
-        $prefs = json_decode((string) \Option::get(self::prefsOption($user_id), ''), true);
+        // Core's Option stores arrays as JSON and already decodes them on get().
+        $prefs = \Option::get(self::prefsOption($user_id), []);
+        if (is_string($prefs)) {
+            $prefs = json_decode($prefs, true);
+        }
 
         return is_array($prefs) ? $prefs : [];
     }
@@ -160,7 +164,7 @@ class Features
         }
         $prefs = self::prefs($user_id);
         $prefs[$key] = $clean;
-        \Option::set(self::prefsOption($user_id), json_encode($prefs));
+        \Option::set(self::prefsOption($user_id), $prefs);
 
         return true;
     }

@@ -12,7 +12,7 @@
                 <div class="license-status-message">
                     @if($isValid)
                         <div class="alert alert-success">
-                            <i class="glyphicon glyphicon-ok"></i> {{ __('Licence is active. All MFS Essentials features are on.') }}
+                            <i class="glyphicon glyphicon-ok"></i> {{ __('Licence is active. Switch the features on or off under Features below.') }}
                             @if(!empty($licenseStatus['expires_at']))
                                 {{ __('Paid until :date.', ['date' => \Carbon\Carbon::parse($licenseStatus['expires_at'])->format('j M Y')]) }}
                             @endif
