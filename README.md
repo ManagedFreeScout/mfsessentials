@@ -1,7 +1,7 @@
 # MFSEssentials — FreeScout Editor Upgrade for Replies and Notes Module
 
 **Module alias:** `mfsessentials`
-**Version:** 1.4.0
+**Version:** 1.4.1
 **GitHub:** https://github.com/ManagedFreeScout/mfsessentials
 **Namespace:** `Modules\MFSEssentials`
 
@@ -276,3 +276,4 @@ no reinstall/reactivate needed.
 | 2026-10-09 | v1.3.1 fix (board card freescout-modules #305): the 6-hourly licence re-check was registered with Eventy addAction, but FreeScout builds its schedule with Eventy::filter('schedule'), so it never ran; only manual checks kept the licence fresh (14-day staleness backstop would have switched the features off). Now addFilter + return $schedule, like the official modules. No other changes. | Verify after the next 6-hour mark that modules_licenses.updated_at moves. |
 | 2026-10-09 | v1.3.2 (board card freescout-modules #306): no reaction bar under notes on FreeScout's print view (?print=1), so printouts (also MFS Print) show no 👍/✅ buttons. Display name with a space: "MFS Essentials" (module.json name + the user-facing __() texts in settings, licence messages, convert error). Folder, namespace, alias, routes, option keys and log prefixes unchanged. | Re-take the full-printout screenshots (MFS Print help center + product page). |
 | 2026-10-19 | v1.4.0 (board card freescout-modules #340): layout features and editor extras moved in from the test module "MFS Layout (test)" (see Part 5), feature switches on the settings page (all on by default), per-agent preferences stored in FreeScout, emoji button inside the formatting group. Release candidates rc1/rc2 tested on demo.managedfreescout.com and support.stackpros.io (rc2 fixed per-agent preferences being decoded twice). | Manual source document + help center (new screenshots), remove "MFS Layout (test)" from demo and support. |
+| 2026-10-19 | v1.4.1 (board card freescout-modules #340, found by Rutger on demo): (1) the fixed conversation header had z-index 8 while Summernote's editor toolbar has 500 in the same stacking context, so with a Reply or Note editor open the Assignee/Status dropdowns opened behind the editor toolbar (and the toolbar slid over the header when scrolling); header now z-index 600, also in the split-view pane. (2) In the split-view pane the header sits at the top of the frame, so core's tooltips above Assignee/Status opened outside the frame (only the arrow showed); there they now open below (show.bs.tooltip handler in mfsessentials-layout.js). Both tested on demo with Playwright and by Rutger. | — |
