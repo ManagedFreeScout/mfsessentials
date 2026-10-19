@@ -142,6 +142,17 @@
         if (coreCol) {
             coreCol.classList.add('hidden');
         }
+        // The fixed header sits at the very top of the pane, so core's tooltips above its buttons
+        // (Assignee, Status, ...) would open outside the frame: only the arrow showed. Show them
+        // below instead; Bootstrap reads the placement on every show.
+        if (window.jQuery) {
+            window.jQuery(document).on('show.bs.tooltip', '#conv-layout-header [data-toggle="tooltip"]', function () {
+                var tip = window.jQuery(this).data('bs.tooltip');
+                if (tip) {
+                    tip.options.placement = 'bottom';
+                }
+            });
+        }
         return;
     }
 
