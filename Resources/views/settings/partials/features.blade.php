@@ -42,7 +42,7 @@
                     <div class="form-group margin-top">
                         <div class="col-sm-8 col-sm-offset-3">
                             <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-                            <p class="form-help margin-top-10">{{ __('Applies to all agents. The code-block fix (long lines wrap) is always on with a valid licence.') }}</p>
+                            <p class="form-help margin-top-10">{{ __('These switches apply to all agents. Within a feature, each agent\'s own choices (split view on or off, column widths, which statuses are shown) are remembered for that agent only. The code-block fix (long lines wrap) is always on with a valid licence.') }}</p>
                         </div>
                     </div>
                 </form>

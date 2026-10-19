@@ -1,7 +1,7 @@
 # MFSEssentials — FreeScout Editor Upgrade for Replies and Notes Module
 
 **Module alias:** `mfsessentials`
-**Version:** 1.3.2
+**Version:** 1.4.0
 **GitHub:** https://github.com/ManagedFreeScout/mfsessentials
 **Namespace:** `Modules\MFSEssentials`
 
@@ -12,6 +12,24 @@ buy it on https://managedfreescout.com/mfsessentials/. On the GitHub auto-update
 
 ---
 ## Summary - What it does
+
+📌 **Fixed panels** (new in 1.4.0)
+The top menu, the folders and the ticket list header stay in place while you scroll. On a conversation, the toolbar and the title stay at the top and the customer panel stays in view, while custom fields, checklists and the editor scroll with the page.
+
+🪟 **Split view** (new in 1.4.0)
+Click **Split view** above the ticket list: the list stays on the left and the conversation you click opens on the right, like in a mail program. Drag the divider to taste. Each agent switches it on for themselves.
+
+✅ **Status filters** (new in 1.4.0)
+Active / Pending / Closed checkboxes above the ticket list show only what you need — also in the Inbox and Custom Folders modules' folders.
+
+↕️ **Sortable and adjustable columns** (new in 1.4.0)
+Sort the ticket list by Customer and Assigned To as well, and drag the border between two columns to change their width. Every sortable column shows ⇅.
+
+✍️ **Editor extras** (new in 1.4.0)
+In the Reply and Note editors: Tab / Shift+Tab for sub-lists in bulleted and numbered lists, indent and outdent, strikethrough, alignment, undo and redo, a horizontal line, and fullscreen for long replies.
+
+⚙️ **Switch each feature on or off** (new in 1.4.0)
+Manage → Settings → MFS Essentials has a switch per feature (all on by default). Agents' own choices — split view, divider, column widths, hidden statuses — are remembered per agent, on every computer and in the Teams tab.
 
 😊 **Emoji & special character picker**
 A toolbar button in both the Reply and Note editors that lets you insert emoji and special characters (currency symbols, arrows, typographic dashes, and more) directly into your text — works the same whether you're writing an internal note or a reply that goes straight to a customer.
@@ -37,7 +55,7 @@ FreeScout's built-in "Code" text style previously forced a horizontal scrollbar 
 1. Download the latest mfsessentials.zip from the Releases page.
 2. Using FTP, SFTP, or your hosting control panel's file manager, upload and extract the zip into your FreeScout installation's Modules/ folder, so the files land at Modules/MFSEssentials/ (not nested inside another MFSEssentials/ folder).
 3. In FreeScout, go to Manage → Modules, find MFSEssentials, and click Activate.
-4. Go to Manage → Settings → MFSEssentials, enter your licence key and click Activate licence. You find the key in your customer account (linked in the email you received after your purchase). All features switch on right away: Convert to note in each email's menu, the reaction bar on internal notes, the emoji/symbol button in the Reply and Note editors, and wrapping code blocks.
+4. Go to Manage → Settings → MFSEssentials, enter your licence key and click Activate licence. You find the key in your customer account (linked in the email you received after your purchase). All features switch on right away: fixed panels, split view, status filters, sortable and adjustable columns, the editor extras, Convert to note in each email's menu, the reaction bar on internal notes, the emoji/symbol button in the Reply and Note editors, and wrapping code blocks. Switch any of them off under **Features** on the same page.
 
 **Updates**
 Once installed, FreeScout will automatically show an "Update available" notice on the Manage → Modules page whenever a new version is released — just click Update Now. No manual re-upload needed for future versions.
@@ -145,6 +163,52 @@ right after updating from a free version (no grace period).
   in use elsewhere / not checked for 14 days), paid-until date, last check, buy/renew link, licence key
   with Activate / Deactivate. FreeScout's Manage → Modules page shows the licence too.
 
+### Part 5 — Layout features, editor extras, switches (v1.4.0, board card freescout-modules #340)
+Built and tested first as a separate test module "MFS Layout (test)" on demo and support (16–19 Oct
+2026), then moved in here. Decisions (Rutger, 19 Oct 2026): part of MFS Essentials (no fourth module),
+same licence and price, every feature on by default (also for updates from 1.3.x), admin switch per feature.
+
+- **Switches:** `Services/Features.php`. Eight FreeScout options (`mfsessentials_fixed_panels`,
+  `_split_view`, `_status_filters`, `_list_columns`, `_editor_extras`, `_emoji`, `_reactions`,
+  `_convert`), saved by core's own settings form (`settings.section_settings` + `section_params`
+  with `'default' => true`, so an unticked switch saves false). `Features::enabled()` = licence AND
+  switch. Every feature's JS/CSS is only loaded when its switch is on; the reactions and convert hooks
+  and controllers check their switch too. The code-block fix has no switch.
+- **Per-agent preferences:** one option per user, `mfsessentials_prefs_{user_id}` (core's Option
+  stores the array as JSON and decodes it on get): `split`, `listw` (divider, % 20–75), `colw`
+  (px per column, 50–2000), `hide_status` (subset of 1/2/3, never all three). Saved via
+  `POST /mfsessentials/prefs` (`PrefsController`, web + auth), validated in `Features::cleanPref()`.
+  They reach the page as a JSON block in `<head>` (`layout.head`, `#mfsessentials-config`; no inline
+  script, so no CSP nonce needed).
+- **Body classes** (`body.class`): `mfsl-on` (any layout feature or editor extras), `mfsl-fixed`,
+  `mfsl-editor`, `mfsl-status-filters` (filters apply to the folder shown). Not on `?print=1`.
+- **Fixed panels:** `position: sticky` (core's `#app { overflow: hidden }` disables sticky, so
+  `overflow: clip`). On a conversation only toolbar + title stay fixed: `mfsessentials-layout.js`
+  moves everything after `.conv-subj-block` (other modules' blocks such as Custom Fields, Checklists,
+  Kanban, and the reply/note editor) to the top of `#conv-layout-main`, after core's start-up, and
+  mirrors core's `.action-visible`; "Switch to a note" is handled in the capture phase with core's
+  `switchToNote()`. Core 1.8.248's list column (`#conv-list-2col`) is kept below the fixed menu.
+- **Split view:** the conversation opens in an iframe (`/conversation/{id}?x_embed=1`, core's own
+  embed mode); `?mfsl_open=<id>` keeps reload/back working; the list refreshes after every pane load;
+  core's list column is hidden inside the pane (marked hidden before core's `initConvCol()`).
+- **Status filters:** `folder.conversations_query` at priority 100 (after Inbox and Custom Folders,
+  which replace the query at 20): `whereNotIn('conversations.status', hidden)`.
+- **Sorting:** core only sorts subject/number/date (hard-coded whitelist). Customer and Assigned To
+  are sorted in `folder.conversations_query` at priority 110 with fixed SQL expressions (customer
+  name else e-mail; user name; empty values last); core's own order follows as the tie-breaker. The
+  sort travels in core's `data-sorting_*` attributes; the jQuery `.data()` cache is cleared, never
+  filled, so core's own header clicks still win.
+- **Column widths:** each handle moves the border between two columns (left grows, right shrinks;
+  Conversation takes the rest, min 160px).
+- **Editor extras:** `mfsessentials-editor-extras.js`. Tab / Shift+Tab nest list items INSIDE the
+  previous item (`<li>One<ul><li>Two</li></ul></li>`, valid HTML, unlike Summernote's own indent),
+  one undo step each; buttons added by name through core's `conversation.editor_toolbar` and
+  `editor.options` filters (Extended Editor inserts by position first, still works). Fullscreen is one
+  screen (toolbar, text, FreeScout's Send bar) and lifts `.content-2col` / the header above the fixed
+  menu while open.
+- **Emoji button:** now inside the formatting group (`.note-style`); before, it sat after core's
+  Save/Discard group, behind the 110px core keeps free for it.
+
 ## Files
 
 ```
@@ -154,22 +218,26 @@ MFSEssentials/
 ├── start.php                                   Loads routes
 ├── Providers/MFSEssentialsServiceProvider.php  stylesheets/javascripts registration, migrations, thread.meta hook
 ├── Http/
-│   ├── routes.php                              POST /mfsessentials/reactions/toggle, POST /mfsessentials/thread/convert
-│   └── Controllers/ReactionsController.php, ConvertController.php
+│   ├── routes.php                              POST /mfsessentials/reactions/toggle, /thread/convert, /prefs
+│   └── Controllers/ReactionsController.php, ConvertController.php, PrefsController.php (Part 5)
+├── Services/Features.php                       Part 5 — feature switches, per-agent preferences
 ├── Services/ThreadConverter.php                Part 3 — convert to note / back, banner data, action types
 ├── Services/LicenseService.php                 Part 4 — licence via the hub, isLicensed() gate
 ├── Models/MFSEssentialsLicense.php             Part 4 — modules_licenses row (module_alias mfsessentials), 14-day backstop
 ├── Config/config.php                           Part 4 — hub_url, buy_url, terms_url
 ├── Http/Controllers/MFSEssentialsController.php Part 4 — settings-page licence actions (admin)
-├── Resources/views/settings/                   Part 4 — settings section + licence panel
+├── Resources/views/settings/                   Part 4 — settings section + licence panel; Part 5 — Features panel
 ├── Entities/ThreadReaction.php                 ALLOWED_EMOJI, toggle(), summaryFor()
 ├── Database/Migrations/..._create_mfsessentials_thread_reactions_table.php
 ├── Public/
 │   ├── css/module.css                          Part 0 fix + Part 1 picker + Part 2 bar styling
+│   ├── css/mfsessentials-layout.css            Part 5 — layout features + editor extras
 │   └── js/
 │       ├── mfsessentials-editor.js             Part 1 — emoji/symbol picker
 │       ├── mfsessentials-reactions.js          Part 2 — reaction bar click handling
-│       └── mfsessentials-convert.js            Part 3 — convert menu items
+│       ├── mfsessentials-convert.js            Part 3 — convert menu items
+│       ├── mfsessentials-layout.js             Part 5 — fixed panels, split view, filters, sorting, columns
+│       └── mfsessentials-editor-extras.js      Part 5 — sub-lists, extra toolbar buttons, fullscreen
 └── Resources/views/partials/reactions-bar.blade.php, convert-banner.blade.php
 ```
 
@@ -207,3 +275,4 @@ no reinstall/reactivate needed.
 | 2026-07-21 | v1.1.1 GitHub pipeline setup: confirmed VPS working copy byte-identical to the live install (full recursive md5sum, not just version string) before proceeding. Added `latestVersionUrl`/`latestVersionZipUrl` to `module.json` (pushed to both the dev copy and the live install) and created `version.txt`. First-time repo setup: `/var/www/modules-dev/github-mfsessentials/` created, `.gitignore` copied from `github-msteamssso`'s (not invented fresh), committed and pushed to `github.com/ManagedFreeScout/mfsessentials` (root commit `716a945`, verified publicly reachable via unauthenticated `git ls-remote`). Release zip built and confirmed `.git`-free (caught and corrected one false-positive check first — `.gitignore` itself matches a naive `grep '\.git'`, had to check for `\.git/` specifically). Published GitHub Release `v1.1.1` and uploaded `mfsessentials.zip` via the REST API (no `gh` CLI on this VPS) — PAT read from `~/.credentials/mfstoken` only to construct the remote/Authorization header inline, never echoed/logged. Both auto-update URLs verified live (`version.txt` returns `1.1.1`; the zip URL 302s to the correct release asset). Confirmed from source exactly when/how often FreeScout reads these fields — see Distribution section above; no live-install reinstall needed, pipeline already active. | None outstanding from this session — genuinely done. Next real "next step" is whenever v1.1.2+ actually ships: bump both `module.json` files, update `version.txt`, commit to `github-mfsessentials`, rebuild the release zip, publish a new GitHub Release. |
 | 2026-10-09 | v1.3.1 fix (board card freescout-modules #305): the 6-hourly licence re-check was registered with Eventy addAction, but FreeScout builds its schedule with Eventy::filter('schedule'), so it never ran; only manual checks kept the licence fresh (14-day staleness backstop would have switched the features off). Now addFilter + return $schedule, like the official modules. No other changes. | Verify after the next 6-hour mark that modules_licenses.updated_at moves. |
 | 2026-10-09 | v1.3.2 (board card freescout-modules #306): no reaction bar under notes on FreeScout's print view (?print=1), so printouts (also MFS Print) show no 👍/✅ buttons. Display name with a space: "MFS Essentials" (module.json name + the user-facing __() texts in settings, licence messages, convert error). Folder, namespace, alias, routes, option keys and log prefixes unchanged. | Re-take the full-printout screenshots (MFS Print help center + product page). |
+| 2026-10-19 | v1.4.0 (board card freescout-modules #340): layout features and editor extras moved in from the test module "MFS Layout (test)" (see Part 5), feature switches on the settings page (all on by default), per-agent preferences stored in FreeScout, emoji button inside the formatting group. Release candidates rc1/rc2 tested on demo.managedfreescout.com and support.stackpros.io (rc2 fixed per-agent preferences being decoded twice). | Manual source document + help center (new screenshots), remove "MFS Layout (test)" from demo and support. |
