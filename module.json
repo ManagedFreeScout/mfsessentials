@@ -1,8 +1,8 @@
 {
   "name": "MFS Essentials",
   "alias": "mfsessentials",
-  "description": "FreeScout editor quality-of-life features: code-block wrap fix, emoji/symbol insertion, note reactions, and converting an email to an internal note.",
-  "version": "1.3.2",
+  "description": "Fixed panels, split view, status filters, sortable and adjustable columns, editor extras (sub-lists, more buttons, fullscreen), emoji/symbol picker, note reactions, converting an email to a note, and a code-block wrap fix.",
+  "version": "1.4.0-rc1",
   "author": "StackPros",
   "keywords": [],
   "active": 1,

@@ -6,6 +6,7 @@ use App\Thread;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Modules\MFSEssentials\Services\Features;
 use Modules\MFSEssentials\Services\LicenseService;
 use Modules\MFSEssentials\Services\ThreadConverter;
 
@@ -20,6 +21,10 @@ class ConvertController extends Controller
         // Licence gate (card #194), server-side too, not only by hiding the menu item.
         if (!LicenseService::isLicensed()) {
             return response()->json(['status' => 'error', 'msg' => __('MFS Essentials has no active licence.')]);
+        }
+        // 1.4.0: switched off by the admin (Manage → Settings → MFS Essentials).
+        if (!Features::enabled('convert')) {
+            return response()->json(['status' => 'error', 'msg' => __('This MFS Essentials feature is switched off.')]);
         }
 
         $thread = Thread::find((int) $request->input('thread_id'));

@@ -1,0 +1,545 @@
+/**
+ * MFS Essentials 1.4.0 — layout features + editor extras (card freescout-modules #340).
+ * Scoped to body classes set server-side (body.class hook), one per switch: mfsl-fixed (fixed
+ * panels), mfsl-editor (editor extras); mfsl-on = any of them. Split view, filters and columns
+ * only exist when their script creates them. Also scoped to desktop widths, so phones and
+ * narrow screens keep FreeScout's own layout.
+ * --mfsl-nav-h is the height of the top menu, measured by mfsessentials-layout.js (0 in x_embed).
+ */
+
+/* ---------- Fixed panels ---------- */
+
+@media (min-width: 992px) {
+    /* #app has overflow:hidden in core, which makes position:sticky a no-op.
+       overflow:clip still clips but creates no scroll container. */
+    body.mfsl-fixed #app {
+        overflow: clip;
+    }
+
+    body.mfsl-fixed .navbar-static-top {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    /* Folders on the left: stay in place, scroll on their own when long. */
+    body.mfsl-fixed .layout-2col {
+        align-items: flex-start;
+    }
+    body.mfsl-fixed .content-2col {
+        align-self: stretch;
+    }
+    /* Core's bulk-actions bar jumps to top:0 when scrolling; keep it below the fixed menu. */
+    body.mfsl-fixed #conversations-bulk-actions.affix {
+        top: var(--mfsl-nav-h, 54px);
+    }
+    /* Ticket list header (select all, sorting) stays visible while the list scrolls. */
+    body.mfsl-fixed:not(.mfsl-split) .table-conversations thead th {
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        z-index: 5;
+        background-color: #deecf9;
+    }
+    body.mfsl-fixed .sidebar-2col {
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        max-height: calc(100vh - var(--mfsl-nav-h, 54px));
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+}
+
+/* Conversation page: toolbar + title bar (star, number) fixed, customer panel in place.
+   Core switches to a single column at <=1100px, so this only applies above that. */
+@media (min-width: 1101px) {
+    body.mfsl-fixed #conv-layout-header {
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        z-index: 8;
+        width: calc(100% - 280px);
+        padding-right: 0;
+        background-color: #fff;
+    }
+    body.mfsl-fixed #conv-layout-main {
+        width: calc(100% - 280px);
+        padding-right: 0;
+    }
+    body.mfsl-fixed #conv-layout-customer {
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        float: right;
+        height: calc(100vh - var(--mfsl-nav-h, 54px));
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+    /* Core's small footer sits below the conversation; with the customer panel fixed
+       it would push that panel up at the very bottom. Core hides it on list pages too. */
+    body.mfsl-fixed.body-conv .footer {
+        display: none;
+    }
+    /* Inside the scrollable panel the photo cannot hang above the panel edge. */
+    body.mfsl-fixed #conv-layout-customer .customer-photo-container {
+        margin-top: 0;
+    }
+}
+
+/* ---------- Split view (list pages) ---------- */
+
+.mfsl-split-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px 6px 14px;
+    min-height: 36px;
+}
+.mfsl-filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.mfsl-filter {
+    margin: 0;
+    font-weight: normal;
+    color: #4f5d69;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.mfsl-filter input {
+    margin: 0 4px 0 0;
+    vertical-align: -2px;
+}
+.mfsl-split-toggle {
+    margin-left: auto;
+}
+.mfsl-divider,
+.mfsl-pane {
+    display: none;
+}
+
+@media (max-width: 1199px) {
+    .mfsl-split-toggle {
+        display: none;
+    }
+    /* Nothing left in the bar: don't leave an empty strip. */
+    body:not(.mfsl-status-filters) .mfsl-split-bar {
+        display: none;
+    }
+}
+
+@media (min-width: 1200px) {
+    body.mfsl-split .content-2col {
+        display: flex;
+        align-items: flex-start;
+        min-width: 0;
+    }
+    /* Bulk-actions bar over the list only (core sizes it to the whole content area). */
+    body.mfsl-split #conversations-bulk-actions {
+        width: var(--mfsl-list-px, 40%) !important;
+    }
+    body.mfsl-split #conversations-bulk-actions.affix-top {
+        left: 0;
+    }
+    body.mfsl-split #conversations-bulk-actions.affix {
+        left: var(--mfsl-list-left, 260px);
+        right: auto;
+    }
+    body.mfsl-split .mfsl-list {
+        container-type: inline-size;
+        position: relative;
+        flex: 0 0 var(--mfsl-list-w, 40%);
+        width: var(--mfsl-list-w, 40%);
+        min-width: 0;
+        overflow-x: clip;
+    }
+    body.mfsl-split .mfsl-divider {
+        display: block;
+        flex: 0 0 6px;
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        height: calc(100vh - var(--mfsl-nav-h, 54px));
+        cursor: col-resize;
+        background-color: #e3e8eb;
+    }
+    body.mfsl-split .mfsl-divider:hover,
+    body.mfsl-split.mfsl-dragging .mfsl-divider {
+        background-color: #9fb7cc;
+    }
+    body.mfsl-split .mfsl-pane {
+        display: block;
+        flex: 1 1 auto;
+        min-width: 0;
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        height: calc(100vh - var(--mfsl-nav-h, 54px));
+        background-color: #fff;
+    }
+    body.mfsl-split .mfsl-pane iframe {
+        border: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    body.mfsl-split .mfsl-pane-empty {
+        color: #93a1af;
+        text-align: center;
+        padding-top: 30vh;
+        font-size: 15px;
+    }
+    /* No iframe events while dragging, or the drag stops at the pane edge. */
+    body.mfsl-dragging .mfsl-pane iframe {
+        pointer-events: none;
+    }
+    body.mfsl-dragging {
+        user-select: none;
+        cursor: col-resize;
+    }
+
+    /* Narrow list: our own two-line grid per row, header row and checkboxes kept.
+         [cb] customer (count, assignee)      date
+         [cb] subject / preview               star
+       Cells we don't place (owner, number, other modules' cells) are hidden. */
+    body.mfsl-split .mfsl-list .table.table-conversations,
+    body.mfsl-split .mfsl-list .table.table-conversations thead,
+    body.mfsl-split .mfsl-list .table.table-conversations tbody,
+    body.mfsl-split .mfsl-list .table.table-conversations tfoot {
+        display: block;
+        width: 100%;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations colgroup {
+        display: none;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead tr {
+        display: flex;
+        align-items: stretch;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead th {
+        display: none;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead {
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        z-index: 5;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-cb {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 34px;
+        padding: 0;
+    }
+    /* Core's checkbox label has no height and draws its 20px box from the top edge. */
+    body.mfsl-split .mfsl-list .table.table-conversations .conv-cb label {
+        width: 20px;
+        height: 20px;
+        padding-left: 0;
+        margin: 0;
+        top: 0;
+        left: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-customer,
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-subject {
+        display: block;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead th {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-owner,
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-date {
+        display: block;
+        flex: 0 0 auto;
+        width: auto;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row {
+        display: grid;
+        /* Fixed widths for star + number, so they line up from row to row. */
+        grid-template-columns: 34px minmax(0, 1fr) 24px 74px;
+        grid-template-areas: "cb cust date date" "cb subj star num";
+        border-bottom: 1px solid #e3e8eb;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td {
+        display: none;
+        border: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-cb {
+        display: block;
+        grid-area: cb;
+        padding: 9px 0 0 7px;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-customer {
+        display: block;
+        grid-area: cust;
+        min-width: 0;
+        padding: 8px 8px 0 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-customer,
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-subject,
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-cb {
+        width: auto;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-customer a {
+        display: inline;
+        padding: 0 !important;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-subject a {
+        margin-top: 0;
+        padding: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-subject p {
+        margin: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-customer .conv-email {
+        display: none;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-customer .conv-owner-mobile {
+        display: inline;
+        font-weight: normal;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-date {
+        display: block;
+        grid-area: date;
+        width: auto;
+        padding: 9px 10px 0 4px;
+        text-align: right;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-date a {
+        background-color: transparent !important;
+        padding: 0 !important;
+        border-radius: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-subject {
+        display: block;
+        grid-area: subj;
+        position: relative;
+        min-width: 0;
+        padding: 2px 8px 9px 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-number {
+        display: block;
+        grid-area: num;
+        width: auto;
+        padding: 3px 10px 0 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        text-align: right;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-number a {
+        display: inline;
+        padding: 0 !important;
+        color: #93a1af;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-thread-count {
+        display: block;
+        grid-area: star;
+        width: auto;
+        padding: 2px 0 0 4px;
+        text-align: right;
+    }
+    /* Core shows the star of the hidden attachment cell on desktop and hides this one. */
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-thread-count .conv-star {
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-thread-count .glyphicon-star-empty {
+        color: #d6dbe0;
+    }
+    /* Paperclip in front of the subject (core shows it only on small screens). */
+    body.mfsl-split .mfsl-list .table.table-conversations .conv-attachment-mobile {
+        display: inline;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tfoot tr {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    body.mfsl-split .mfsl-list .table.table-conversations tfoot td {
+        display: block;
+    }
+    body.mfsl-split .mfsl-list .table-conversations tr.mfsl-active {
+        background-color: #deecf9 !important;
+        box-shadow: inset 3px 0 0 #0078d7;
+    }
+}
+
+/* ---------- The conversation inside the split pane ---------- */
+
+/* Folders are already visible in the main window. */
+body.mfsl-in-pane .sidebar-2col {
+    display: none;
+}
+body.mfsl-in-pane .content-2col {
+    border-left: 0;
+}
+/* The pane is narrower than 992px most of the time, so the desktop rules above
+   do not apply inside it: keep the toolbar + title bar fixed there too. */
+body.mfsl-in-pane #app {
+    overflow: clip;
+}
+body.mfsl-in-pane #conv-layout-header {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    background-color: #fff;
+}
+
+/* Narrow split list (divider dragged left): keep Customer + Waiting Since in the header,
+   drop the assignee name from the rows. Sized on the list, not the window. */
+@container (max-width: 460px) {
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-subject,
+    body.mfsl-split .mfsl-list .table.table-conversations thead th.conv-owner {
+        display: none !important;
+    }
+}
+@container (max-width: 340px) {
+    body.mfsl-split .mfsl-list .table.table-conversations tbody tr.conv-row > td.conv-customer .conv-owner-mobile {
+        display: none;
+    }
+}
+.mfsl-filter input:disabled {
+    cursor: not-allowed;
+}
+
+/* ---------- Extra sortable columns (Customer, Assigned To) ---------- */
+.table-conversations .mfsl-sort,
+.table-conversations .mfsl-sort-label {
+    cursor: pointer;
+}
+/* .mfsl-sort-hint: the same ⇅ on core's sortable headers (handled by core's own click). */
+.table-conversations .mfsl-sort,
+.table-conversations .mfsl-sort-hint {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 0 3px;
+    color: #93a1af;
+    font-weight: normal;
+}
+/* Tighter on core's headers: Number is narrow and the hint must stay clear of the resize
+   handle in the cell's right padding, or the handle takes the click. */
+.table-conversations .mfsl-sort-hint {
+    margin-left: 2px;
+    padding: 0;
+}
+.table-conversations .mfsl-sort:hover,
+.table-conversations .conv-col-sort:hover .mfsl-sort-hint,
+.table-conversations .mfsl-sort-active {
+    color: inherit;
+}
+
+/* ---------- Resizable columns (normal list on desktop, not split view) ----------
+   The handle stays inside its own header cell: the next (sticky) cell paints over anything
+   that sticks out. */
+.mfsl-col-resize {
+    display: none;
+}
+@media (min-width: 992px) {
+    body.mfsl-on:not(.mfsl-split) .table-conversations thead th .mfsl-col-resize {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 6px;
+        height: 100%;
+        cursor: col-resize;
+        z-index: 6;
+    }
+    body.mfsl-on:not(.mfsl-split) .table-conversations thead th .mfsl-col-resize::after {
+        content: "";
+        position: absolute;
+        top: 20%;
+        bottom: 20%;
+        right: 0;
+        width: 2px;
+        background: #c3ccd4;
+        opacity: 0;
+        transition: opacity .15s;
+    }
+    body.mfsl-on:not(.mfsl-split) .table-conversations thead tr:hover .mfsl-col-resize::after,
+    body.mfsl-resizing .table-conversations thead th .mfsl-col-resize::after {
+        opacity: 1;
+    }
+}
+body.mfsl-resizing,
+body.mfsl-resizing * {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+/* ---------- FreeScout 1.8.248: core's own list column on the conversation page ----------
+   (#conv-list-2col, opened with the arrow left of the toolbar; core remembers it in the
+   conv_col cookie). Core sticks it at top:0, which with our fixed top menu puts its header
+   (title + hide button) under the menu: start it below the menu instead. */
+@media (min-width: 992px) {
+    /* Our .layout-2col uses align-items:flex-start (for the sticky folders); core's wrapper
+       must still fill the whole row, or the sticky column runs out of room at the bottom
+       of the page and slides up under the menu. */
+    body.mfsl-fixed #conv-list-2col {
+        align-self: stretch;
+    }
+    /* Core makes the column position:absolute once loaded (.loaded), so it scrolls away with
+       the page. With fixed panels it stays in place like the folders and the customer panel:
+       sticky below the menu, one screen high, the list scrolls inside it. */
+    body.mfsl-fixed #conv-list-col,
+    body.mfsl-fixed #conv-list-col.loaded {
+        position: sticky;
+        top: var(--mfsl-nav-h, 54px);
+        height: calc(100vh - var(--mfsl-nav-h, 54px));
+    }
+}
+/* Not inside our split pane: our list is already on the left (mfsessentials-layout.js also marks it
+   hidden there before core loads it). */
+body.mfsl-in-pane #conv-list-2col,
+body.mfsl-in-pane #conv-list-open {
+    display: none !important;
+}
+
+/* ---------- Editor (mfsessentials-editor-extras.js) ---------- */
+/* Fullscreen editor: Summernote makes it position:fixed with z-index 1050, but it sits inside
+   our fixed conversation header (z-index 8) inside core's .content-2col (z-index 2), which caps
+   it below the fixed top menu and the customer panel. Lift those two only while fullscreen. */
+body.mfsl-editor .content-2col:has(.note-editor.fullscreen),
+body.mfsl-editor #conv-layout-header:has(.note-editor.fullscreen) {
+    z-index: 1050;
+}
+/* Summernote sizes the text area to the window minus its toolbar and doesn't know about
+   FreeScout's bar underneath (status, assign, Send), which then falls off the screen.
+   Fullscreen = one screen: toolbar, text area (scrolls), FreeScout's bar. */
+body.mfsl-editor .note-editor.note-frame.fullscreen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+body.mfsl-editor .note-editor.note-frame.fullscreen > .note-toolbar,
+body.mfsl-editor .note-editor.note-frame.fullscreen > .note-statusbar {
+    flex: 0 0 auto;
+}
+body.mfsl-editor .note-editor.note-frame.fullscreen > .note-editing-area {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+body.mfsl-editor .note-editor.note-frame.fullscreen > .note-editing-area > .note-editable {
+    height: 100% !important;
+    overflow-y: auto;
+}
+/* Alignment dropdown: the three buttons on one row (the default 90px menu wraps them). */
+body.mfsl-editor .note-toolbar .mfsl-align .dropdown-menu {
+    min-width: 0;
+    white-space: nowrap;
+}
+body.mfsl-editor .note-toolbar .mfsl-align .dropdown-menu > .btn {
+    float: none;
+    display: inline-block;
+}
+
+/* Conversation: the blocks moved out of the fixed header (mfsessentials-layout.js slimHeader) keep the
+   white background they had inside the header. */
+#mfsl-below-header {
+    background-color: #fff;
+}

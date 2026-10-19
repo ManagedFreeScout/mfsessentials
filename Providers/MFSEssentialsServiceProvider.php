@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\MFSEssentials\Entities\ThreadReaction;
 use Modules\MFSEssentials\Services\ThreadConverter;
 use Modules\MFSEssentials\Services\LicenseService;
+use Modules\MFSEssentials\Services\Features;
 
 defined('MFSESSENTIALS_MODULE') || define('MFSESSENTIALS_MODULE', 'mfsessentials');
 
@@ -25,6 +26,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         $this->registerAssets();
         $this->registerReactionsHook();
         $this->registerConvertHooks();
+        $this->registerLayoutHooks();
     }
 
     public function register()
@@ -59,9 +61,13 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             return $sections;
         }, 15);
 
+        // 1.4.0: the feature switches are plain options in this section, so core's own settings
+        // form saves them (SettingsController::processSave). 'default' => true makes an unticked
+        // switch save as false instead of falling back to "on".
         \Eventy::addFilter('settings.section_settings', function ($settings, $section) {
             if ($section === self::MODULE_ALIAS) {
                 $settings['license_status'] = app(LicenseService::class)->getLicenseStatus();
+                $settings = array_merge($settings, Features::switches());
             }
             return $settings;
         }, 20, 2);
@@ -69,6 +75,9 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         \Eventy::addFilter('settings.section_params', function ($params, $section) {
             if ($section === self::MODULE_ALIAS) {
                 $params['license_status'] = app(LicenseService::class)->getLicenseStatus();
+                foreach (array_keys(Features::SWITCHES) as $name) {
+                    $params['settings'][$name] = ['default' => true];
+                }
             }
             return $params;
         }, 20, 2);
@@ -124,11 +133,17 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         // not asset() (asset() has no such helper, FreeScout_Development_Notes.md §3.4).
         // Licence gate (card #194): no licence = none of the CSS/JS is loaded, which also
         // switches off the code-block wrap fix (pure CSS, nothing else to gate).
+        // 1.4.0: each feature's file only when its switch is on (Manage → Settings → MFS Essentials).
+        // module.css stays with the licence: it holds the code-block wrap fix (no switch).
         \Eventy::addFilter('stylesheets', function ($items) {
             if (!LicenseService::isLicensed()) {
                 return $items;
             }
-            $items[] = \Module::getPublicPath(self::MODULE_ALIAS) . '/css/module.css';
+            $path = \Module::getPublicPath(self::MODULE_ALIAS);
+            $items[] = $path . '/css/module.css';
+            if (Features::anyLayout() || Features::enabled('editor_extras')) {
+                $items[] = $path . '/css/mfsessentials-layout.css';
+            }
             return $items;
         }, 20, 1);
 
@@ -136,9 +151,22 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             if (!LicenseService::isLicensed()) {
                 return $items;
             }
-            $items[] = \Module::getPublicPath(self::MODULE_ALIAS) . '/js/mfsessentials-editor.js';
-            $items[] = \Module::getPublicPath(self::MODULE_ALIAS) . '/js/mfsessentials-reactions.js';
-            $items[] = \Module::getPublicPath(self::MODULE_ALIAS) . '/js/mfsessentials-convert.js';
+            $path = \Module::getPublicPath(self::MODULE_ALIAS);
+            if (Features::enabled('emoji')) {
+                $items[] = $path . '/js/mfsessentials-editor.js';
+            }
+            if (Features::enabled('reactions')) {
+                $items[] = $path . '/js/mfsessentials-reactions.js';
+            }
+            if (Features::enabled('convert')) {
+                $items[] = $path . '/js/mfsessentials-convert.js';
+            }
+            if (Features::anyLayout()) {
+                $items[] = $path . '/js/mfsessentials-layout.js';
+            }
+            if (Features::enabled('editor_extras')) {
+                $items[] = $path . '/js/mfsessentials-editor-extras.js';
+            }
             return $items;
         }, 20, 1);
     }
@@ -151,7 +179,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         // proven in this project's own MSTeamsFSServiceProvider hooks.
         \Eventy::addAction('thread.meta', function ($thread, $loop, $threads, $conversation, $mailbox) {
             // Not on FreeScout's print view (?print=1): a printout shows no reaction buttons (card #306).
-            if (!$thread->isNote() || request()->input('print') || !LicenseService::isLicensed()) {
+            if (!$thread->isNote() || request()->input('print') || !Features::enabled('reactions')) {
                 return;
             }
 
@@ -178,7 +206,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         // attributes so they stay translatable; mfsessentials-convert.js
         // shows them and posts the conversion.
         \Eventy::addAction('thread.menu', function ($thread) {
-            if (!LicenseService::isLicensed() || !Auth::check() || !ThreadConverter::userCanConvert(Auth::user(), $thread)) {
+            if (!Features::enabled('convert') || !Auth::check() || !ThreadConverter::userCanConvert(Auth::user(), $thread)) {
                 return;
             }
 
@@ -233,5 +261,142 @@ class MFSEssentialsServiceProvider extends ServiceProvider
 
             return $did_this;
         }, 20, 2);
+    }
+
+    /** @var int|null Folder type of the list page being rendered (for body.class). */
+    public static $folderType = null;
+
+    /**
+     * Layout features (1.4.0, card freescout-modules #340, tested as "MFS Layout (test)"):
+     * fixed panels, split view, status filters, sortable + adjustable columns. Almost all of it
+     * is CSS/JS behind body classes; the server part is below. Each one has its own switch.
+     */
+    protected function registerLayoutHooks()
+    {
+        // Body classes: mfsl-on = a layout feature or the editor extras are on (scopes the CSS),
+        // mfsl-fixed = fixed panels, mfsl-editor = editor extras, mfsl-status-filters = the filters
+        // apply to the folder shown. Not on FreeScout's print view (?print=1).
+        \Eventy::addAction('body.class', function () {
+            if (request()->input('print') || !LicenseService::isLicensed()) {
+                return;
+            }
+            $editor = Features::enabled('editor_extras');
+            if (!Features::anyLayout() && !$editor) {
+                return;
+            }
+            echo ' mfsl-on';
+            if (Features::enabled('fixed_panels')) {
+                echo ' mfsl-fixed';
+            }
+            if ($editor) {
+                echo ' mfsl-editor';
+            }
+            if (Features::enabled('status_filters') && self::$folderType !== null && self::statusFilterApplies(self::$folderType)) {
+                echo ' mfsl-status-filters';
+            }
+        });
+
+        // Which folder the list page shows (the body.class action has no view data).
+        \View::composer('mailboxes.view', function ($view) {
+            $folder = $view->getData()['folder'] ?? null;
+            self::$folderType = $folder ? (int) $folder->type : null;
+        });
+
+        // Settings for mfsessentials-layout.js / -editor-extras.js: the switches, this agent's
+        // preferences and where to save them. A JSON block, not a script (no CSP nonce needed).
+        \Eventy::addAction('layout.head', function () {
+            if (!LicenseService::isLicensed() || !Auth::check()) {
+                return;
+            }
+            if (!Features::anyLayout() && !Features::enabled('editor_extras')) {
+                return;
+            }
+            $config = [
+                'features' => [
+                    'fixed_panels'   => Features::enabled('fixed_panels'),
+                    'split_view'     => Features::enabled('split_view'),
+                    'status_filters' => Features::enabled('status_filters'),
+                    'list_columns'   => Features::enabled('list_columns'),
+                    'editor_extras'  => Features::enabled('editor_extras'),
+                ],
+                'prefs'    => (object) Features::prefs(),
+                'prefsUrl' => route('mfsessentials.prefs'),
+            ];
+            echo '<script type="application/json" id="mfsessentials-config">'
+                .json_encode($config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)
+                .'</script>';
+        });
+
+        // Status filters (Active / Pending / Closed): leave this agent's hidden statuses out of the
+        // folder query itself, so paging, totals and core's AJAX list refreshes stay correct.
+        // Priority 100 = after other modules: Inbox and Custom Folders REPLACE the query at 20.
+        \Eventy::addFilter('folder.conversations_query', function ($query, $folder, $user_id) {
+            if (!$folder || !self::statusFilterApplies($folder->type)) {
+                return $query;
+            }
+            $possible = [\App\Conversation::STATUS_ACTIVE, \App\Conversation::STATUS_PENDING, \App\Conversation::STATUS_CLOSED];
+            $hidden = array_values(array_intersect($possible, Features::hiddenStatuses()));
+            // Never everything this folder can show: an empty list would look like a bug.
+            if ($hidden && count($hidden) < count($possible)) {
+                $query->whereNotIn('conversations.status', $hidden);
+            }
+            return $query;
+        }, 100, 3);
+
+        // Extra sortable columns (Customer, Assigned To). Core only accepts subject/number/date
+        // and ignores anything else, then appends its own order (status, last reply) after ours,
+        // which becomes the tie-breaker. The sort comes in with core's own AJAX list request.
+        \Eventy::addFilter('folder.conversations_query', function ($query, $folder, $user_id) {
+            $sort = self::extraSort();
+            if (!$sort) {
+                return $query;
+            }
+            $p = \DB::getTablePrefix();
+            if ($sort['sort_by'] == 'customer') {
+                // Same as Customer::getFullName(true): name, else the e-mail address.
+                $expr = "(select coalesce(nullif(trim(concat(coalesce(c.first_name, ''), ' ', coalesce(c.last_name, ''))), ''), {$p}conversations.customer_email)"
+                    ." from {$p}customers c where c.id = {$p}conversations.customer_id)";
+            } else {
+                $expr = "(select nullif(trim(concat(coalesce(u.first_name, ''), ' ', coalesce(u.last_name, ''))), '')"
+                    ." from {$p}users u where u.id = {$p}conversations.user_id)";
+            }
+            // Empty values (no customer, unassigned) always at the bottom.
+            $query->orderByRaw("{$expr} is null asc")->orderByRaw("{$expr} ".$sort['order']);
+            return $query;
+        }, 110, 3);
+    }
+
+    /**
+     * Spam, Deleted and Drafts are their own world; the Closed folder only holds closed ones.
+     * Closed is offered everywhere else: core moves a closed conversation to the Closed folder,
+     * but imports, the API or other modules can leave one in Assigned.
+     */
+    public static function statusFilterApplies($folder_type)
+    {
+        return !in_array((int) $folder_type, [
+            \App\Folder::TYPE_CLOSED,
+            \App\Folder::TYPE_SPAM,
+            \App\Folder::TYPE_DELETED,
+            \App\Folder::TYPE_DRAFTS,
+        ]);
+    }
+
+    /**
+     * Sorting on a column core can't sort, from core's AJAX request (sorting[sort_by], sorting[order]).
+     * The values are checked against fixed lists, so nothing from the request reaches the SQL.
+     */
+    public static function extraSort()
+    {
+        if (\Helper::isConsole() || !Features::enabled('list_columns')) {
+            return null;
+        }
+        $sorting = request()->input('sorting');
+        if (!is_array($sorting)
+            || !in_array($sorting['sort_by'] ?? '', ['customer', 'assignee'], true)
+            || !in_array($sorting['order'] ?? '', ['asc', 'desc'], true)
+        ) {
+            return null;
+        }
+        return ['sort_by' => $sorting['sort_by'], 'order' => $sorting['order']];
     }
 }

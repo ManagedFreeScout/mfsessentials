@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Modules\MFSEssentials\Entities\ThreadReaction;
+use Modules\MFSEssentials\Services\Features;
 use Modules\MFSEssentials\Services\LicenseService;
 
 class ReactionsController extends Controller
@@ -17,6 +18,10 @@ class ReactionsController extends Controller
         // isNote() check below already follows.
         if (!LicenseService::isLicensed()) {
             return response()->json(['error' => 'not_licensed'], 403);
+        }
+        // 1.4.0: switched off by the admin.
+        if (!Features::enabled('reactions')) {
+            return response()->json(['error' => 'switched_off'], 403);
         }
 
         $threadId = (int) $request->input('thread_id');

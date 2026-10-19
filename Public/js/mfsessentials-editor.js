@@ -151,9 +151,14 @@
   function injectInto(toolbar) {
     if (toolbar.querySelector('.' + BTN_CLASS)) return;
 
+    // 1.4.0: at the end of the formatting group (.note-style), right after the other buttons.
+    // Before, it was a group of its own after the last group (Save / Discard): core keeps 110px
+    // free to the right of the formatting group for Save / Discard, so the emoji ended up after
+    // that empty space, or alone on a row in a narrow column (card freescout-modules #340).
+    var styleGroup = toolbar.querySelector(':scope > .note-style');
     var anchorGroups = toolbar.querySelectorAll('.note-btn-group');
     var anchor = anchorGroups.length ? anchorGroups[anchorGroups.length - 1] : null;
-    if (!anchor) return;
+    if (!styleGroup && !anchor) return;
 
     var group = document.createElement('div');
     group.className = 'note-btn-group btn-group';
@@ -240,7 +245,11 @@
 
     group.appendChild(btn);
     group.appendChild(panel);
-    anchor.insertAdjacentElement('afterend', group);
+    if (styleGroup) {
+      styleGroup.appendChild(group);
+    } else {
+      anchor.insertAdjacentElement('afterend', group);
+    }
   }
 
   function injectAll() {

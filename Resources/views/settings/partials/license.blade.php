@@ -23,7 +23,7 @@
                             @if(!empty($licenseStatus['message']) && ($licenseStatus['status'] ?? '') !== 'no_license')
                                 {{ $licenseStatus['message'] }}
                             @endif
-                            {{ __('MFS Essentials is switched off until a valid licence is active: convert to note, note reactions, the emoji and symbol picker and the code-block fix.') }}
+                            {{ __('MFS Essentials is switched off until a valid licence is active: all its features are off.') }}
                             <a href="{{ config('mfsessentials.buy_url') }}" target="_blank" rel="noopener">{{ __('Buy or renew a licence') }}</a>
                         </div>
                     @endif
