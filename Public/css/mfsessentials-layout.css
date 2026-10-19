@@ -52,10 +52,13 @@
 /* Conversation page: toolbar + title bar (star, number) fixed, customer panel in place.
    Core switches to a single column at <=1100px, so this only applies above that. */
 @media (min-width: 1101px) {
+    /* z-index above Summernote's editor toolbar (.note-toolbar, z-index 500): the reply/note editor
+       sits next to this header in the same stacking context, and would otherwise cover the
+       header's dropdowns (assignee, status) and slide over the header when scrolling. */
     body.mfsl-fixed #conv-layout-header {
         position: sticky;
         top: var(--mfsl-nav-h, 54px);
-        z-index: 8;
+        z-index: 600;
         width: calc(100% - 280px);
         padding-right: 0;
         background-color: #fff;
@@ -386,7 +389,7 @@ body.mfsl-in-pane #app {
 body.mfsl-in-pane #conv-layout-header {
     position: sticky;
     top: 0;
-    z-index: 8;
+    z-index: 600; /* above the editor toolbar, see the desktop rule */
     background-color: #fff;
 }
 
@@ -502,7 +505,7 @@ body.mfsl-in-pane #conv-list-open {
 
 /* ---------- Editor (mfsessentials-editor-extras.js) ---------- */
 /* Fullscreen editor: Summernote makes it position:fixed with z-index 1050, but it sits inside
-   our fixed conversation header (z-index 8) inside core's .content-2col (z-index 2), which caps
+   our fixed conversation header (z-index 600) inside core's .content-2col (z-index 2), which caps
    it below the fixed top menu and the customer panel. Lift those two only while fullscreen. */
 body.mfsl-editor .content-2col:has(.note-editor.fullscreen),
 body.mfsl-editor #conv-layout-header:has(.note-editor.fullscreen) {
