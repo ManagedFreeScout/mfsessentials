@@ -2,7 +2,7 @@
   "name": "MFS Essentials",
   "alias": "mfsessentials",
   "description": "Fixed panels, split view, status filters, sortable and adjustable columns, editor extras (sub-lists, more buttons, fullscreen), emoji/symbol picker, note reactions, converting an email to a note, and a code-block wrap fix.",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "StackPros",
   "keywords": [],
   "active": 1,
