@@ -5,7 +5,7 @@
 
 ## What MFS Essentials does
 
-MFS Essentials adds nine everyday upgrades to FreeScout, for every agent in your helpdesk. An admin can switch each one on or off. This manual covers version 1.4.0.
+MFS Essentials adds nine everyday upgrades to FreeScout, for every agent in your helpdesk. An admin can switch each one on or off. This manual covers version 1.4.2.
 
 | Upgrade | What your team gets |
 | --- | --- |
@@ -13,7 +13,7 @@ MFS Essentials adds nine everyday upgrades to FreeScout, for every agent in your
 | Split view | The ticket list on the left, the conversation on the right, like an email program. |
 | Status filters | Active, Pending and Closed checkboxes above the ticket list, to show only what you are working on. |
 | Sortable and adjustable columns | Sort the ticket list by Customer or Assigned To, and drag column borders to the width you like. |
-| Editor extras | Sub-lists with Tab and Shift+Tab, strikethrough, alignment, undo and redo, a horizontal line and fullscreen in the Reply and Note editors. |
+| Editor extras | Sub-lists with Tab and Shift+Tab, strikethrough, alignment, undo and redo, a horizontal line and fullscreen in the Reply and Note editors, also when you edit a note. With the Kanban module, the same buttons in Kanban's card window. |
 | Convert an email to a note | A forwarded internal email that landed in a conversation becomes an internal note, so the client never sees it. Undo with one click. |
 | Reactions on notes | React to a colleague's internal note with 👍 ✅ 👀 🎉, like in Slack or Teams. Hover to see who reacted. |
 | Emoji and symbols | A button in the Reply and Note editors inserts emoji, currency symbols, arrows and dashes. |
@@ -132,7 +132,7 @@ FreeScout lets you sort the ticket list by Conversation, Number and date. MFS Es
 
 ## Editor extras
 
-The Reply and Note editors get the buttons that FreeScout leaves out, and lists that can go a level deeper.
+The Reply and Note editors, and the editor you get when you edit a note, get the buttons that FreeScout leaves out, and lists that can go a level deeper.
 
 ![The reply editor with a sub-list, strikethrough and a line](https://managedfreescout.com/wp-content/uploads/manuals/mfsessentials/18-editor-extras.png?v=e24923b7)
 
@@ -147,6 +147,8 @@ The Reply and Note editors get the buttons that FreeScout leaves out, and lists 
 | Fullscreen | Write a long reply in the whole window. Click again to go back. |
 
 Sub-lists are built the way Gmail and Google Docs build them, so they look right in your client's email program.
+
+**Kanban card editor.** If your helpdesk uses FreeScout's Kanban module, a separate switch, **Kanban card editor**, gives Kanban's New Card and Edit Card window the same buttons, without fullscreen. Add attachments to the card's conversation after you save the card. The switch only appears on the settings page while the Kanban module is active.
 
 ## Convert an email to an internal note
 
@@ -254,7 +256,7 @@ Still stuck? Contact us via [managedfreescout.com/contact-us](https://managedfre
 
 | Version | Released | What changed |
 | --- | --- | --- |
-| 1.4.2 | 23 Oct 2026 | Editing a note gets the same editor buttons as writing one; new switch "Kanban card editor" (only with the Kanban module): the same buttons in Kanban's New Card and Edit Card window; hover hints near the top of the page open below or beside their button instead of behind the top menu; in split view a conversation that leaves the list after you assign, close or delete it there no longer stays open on the right |
+| 1.4.2 | 23 Oct 2026 | Editing a note gets the same editor buttons as writing one; new switch Kanban card editor (only with the Kanban module): the same buttons in Kanban's New Card and Edit Card window; hover hints near the top of the page open below or beside their button instead of behind the top menu; in split view a conversation that leaves the list after you assign, close or delete it there no longer stays open on the right |
 | 1.4.1 | 19 Oct 2026 | With a reply or note open, the Assignee and Status menus open on top of the editor; in split view their hover hints show below the buttons |
 | 1.4.0 | 19 Oct 2026 | Fixed panels, split view, status filters, sortable and adjustable columns, editor extras; a switch per feature; the smiley button now sits with the other editor buttons |
 | 1.3.2 | 9 Oct 2026 | Printouts show no reaction buttons under notes; the module is now called MFS Essentials |
