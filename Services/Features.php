@@ -19,6 +19,7 @@ class Features
         'mfsessentials_status_filters' => 'Status filters',
         'mfsessentials_list_columns'  => 'Sortable and adjustable columns',
         'mfsessentials_editor_extras' => 'Editor extras',
+        'mfsessentials_kanban_editor' => 'Kanban card editor',
         'mfsessentials_emoji'         => 'Emoji and symbol picker',
         'mfsessentials_reactions'     => 'Note reactions',
         'mfsessentials_convert'       => 'Convert an email to a note',
@@ -43,12 +44,30 @@ class Features
         if (strpos($name, 'mfsessentials_') !== 0) {
             $name = 'mfsessentials_'.$name;
         }
-        if (!LicenseService::isLicensed()) {
+        if (!LicenseService::isLicensed() || !self::available($name)) {
             return false;
         }
         $all = self::switches();
 
         return !empty($all[$name]);
+    }
+
+    // Switches for another module's screens (1.4.2): option name => that module's alias.
+    // Only shown on the settings page, and only on, while that module is active.
+    const NEEDS_MODULE = [
+        'mfsessentials_kanban_editor' => 'kanban',
+    ];
+
+    /**
+     * Option name: false when the switch belongs to a module that is not active.
+     */
+    public static function available($name)
+    {
+        if (!isset(self::NEEDS_MODULE[$name])) {
+            return true;
+        }
+
+        return \Module::isActive(self::NEEDS_MODULE[$name]);
     }
 
     /**

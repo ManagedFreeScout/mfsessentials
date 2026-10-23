@@ -125,6 +125,37 @@
         }, true);
     }
 
+    // ---------- Tooltips under the fixed top menu ----------
+    // Core's tooltips open above their button. With the top menu fixed (z-index 1000), a button
+    // close to it (the conversation header once it sticks, the customer panel's cog and envelope)
+    // gets its tooltip behind the menu; in the split-view pane, where the header is at the very
+    // top of the frame, outside the frame (only the arrow showed). Only then it opens below,
+    // or to the left in the customer panel, as the cog's menu opens below it. Bootstrap reads
+    // the placement on every show, so a button further down keeps core's placement.
+    var TOOLTIP_ROOM = 40;
+    if (window.jQuery) {
+        window.jQuery(document).on('show.bs.tooltip', '[data-toggle="tooltip"]', function () {
+            var $el = window.jQuery(this);
+            var tip = $el.data('bs.tooltip');
+            if (!tip) {
+                return;
+            }
+            if (tip.mfslPlacement === undefined) {
+                tip.mfslPlacement = tip.options.placement;
+            }
+            if (tip.mfslPlacement !== 'top') {
+                return;
+            }
+            var nav = document.querySelector('.navbar-static-top');
+            var navBottom = nav && nav.offsetHeight ? Math.max(0, nav.getBoundingClientRect().bottom) : 0;
+            if (this.getBoundingClientRect().top - navBottom >= TOOLTIP_ROOM) {
+                tip.options.placement = 'top';
+            } else {
+                tip.options.placement = $el.closest('#conv-layout-customer').length ? 'left' : 'bottom';
+            }
+        });
+    }
+
     // ---------- Are we the conversation inside the split pane? ----------
 
     var inPane = false;
@@ -141,19 +172,6 @@
         var coreCol = document.getElementById('conv-list-2col');
         if (coreCol) {
             coreCol.classList.add('hidden');
-        }
-        // The fixed header sits at the very top of the pane, so core's tooltips above its buttons
-        // (Assignee, Status, ...) would open outside the frame: only the arrow showed. Show them
-        // below instead; Bootstrap reads the placement on every show. Same for the customer
-        // panel's cog ("Settings") in the top right corner: there to the left, as its menu
-        // opens below it.
-        if (window.jQuery) {
-            window.jQuery(document).on('show.bs.tooltip', '#conv-layout-header [data-toggle="tooltip"], #conv-layout-customer [data-toggle="tooltip"]', function () {
-                var tip = window.jQuery(this).data('bs.tooltip');
-                if (tip) {
-                    tip.options.placement = window.jQuery(this).closest('#conv-layout-customer').length ? 'left' : 'bottom';
-                }
-            });
         }
         return;
     }

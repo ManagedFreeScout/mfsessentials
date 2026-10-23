@@ -67,7 +67,13 @@ class MFSEssentialsServiceProvider extends ServiceProvider
         \Eventy::addFilter('settings.section_settings', function ($settings, $section) {
             if ($section === self::MODULE_ALIAS) {
                 $settings['license_status'] = app(LicenseService::class)->getLicenseStatus();
-                $settings = array_merge($settings, Features::switches());
+                // 1.4.2: a switch for a module that is not active is left out, so saving the
+                // form doesn't turn it off (core saves every option listed here).
+                foreach (Features::switches() as $name => $on) {
+                    if (Features::available($name)) {
+                        $settings[$name] = $on;
+                    }
+                }
             }
             return $settings;
         }, 20, 2);
@@ -76,7 +82,9 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             if ($section === self::MODULE_ALIAS) {
                 $params['license_status'] = app(LicenseService::class)->getLicenseStatus();
                 foreach (array_keys(Features::SWITCHES) as $name) {
-                    $params['settings'][$name] = ['default' => true];
+                    if (Features::available($name)) {
+                        $params['settings'][$name] = ['default' => true];
+                    }
                 }
             }
             return $params;
@@ -141,7 +149,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             }
             $path = \Module::getPublicPath(self::MODULE_ALIAS);
             $items[] = $path . '/css/module.css';
-            if (Features::anyLayout() || Features::enabled('editor_extras')) {
+            if (Features::anyLayout() || Features::enabled('editor_extras') || Features::enabled('kanban_editor')) {
                 $items[] = $path . '/css/mfsessentials-layout.css';
             }
             return $items;
@@ -164,7 +172,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             if (Features::anyLayout()) {
                 $items[] = $path . '/js/mfsessentials-layout.js';
             }
-            if (Features::enabled('editor_extras')) {
+            if (Features::enabled('editor_extras') || Features::enabled('kanban_editor')) {
                 $items[] = $path . '/js/mfsessentials-editor-extras.js';
             }
             return $items;
@@ -280,7 +288,8 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             if (request()->input('print') || !LicenseService::isLicensed()) {
                 return;
             }
-            $editor = Features::enabled('editor_extras');
+            // mfsl-editor also for the Kanban card editor alone: it styles the same buttons.
+            $editor = Features::enabled('editor_extras') || Features::enabled('kanban_editor');
             if (!Features::anyLayout() && !$editor) {
                 return;
             }
@@ -308,7 +317,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
             if (!LicenseService::isLicensed() || !Auth::check()) {
                 return;
             }
-            if (!Features::anyLayout() && !Features::enabled('editor_extras')) {
+            if (!Features::anyLayout() && !Features::enabled('editor_extras') && !Features::enabled('kanban_editor')) {
                 return;
             }
             $config = [
@@ -318,6 +327,7 @@ class MFSEssentialsServiceProvider extends ServiceProvider
                     'status_filters' => Features::enabled('status_filters'),
                     'list_columns'   => Features::enabled('list_columns'),
                     'editor_extras'  => Features::enabled('editor_extras'),
+                    'kanban_editor'  => Features::enabled('kanban_editor'),
                 ],
                 'prefs'    => (object) Features::prefs(),
                 'prefsUrl' => route('mfsessentials.prefs'),

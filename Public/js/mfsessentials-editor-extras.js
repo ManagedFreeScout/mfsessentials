@@ -13,6 +13,7 @@
  * Toolbar buttons are added by name through core's own filters (conversation.editor_toolbar,
  * editor.options), so modules that insert by position (Extended Editor) still work.
  * This file runs before core initialises the editor (document ready), so the filters are in time.
+ * 1.4.2: the same buttons when editing a note, and in Kanban's card window (own switch).
  */
 (function () {
     'use strict';
@@ -310,14 +311,27 @@
         }
     };
 
-    window.fsAddFilter('editor.options', function (options) {
-        options.buttons = $.extend({}, options.buttons || {}, buttons);
-        return options;
-    });
+    // Which editors get the extras: the reply / note editor and editing a note ("Editor extras"),
+    // Kanban's New Card / Edit Card window ("Kanban card editor", 1.4.2). This file is loaded
+    // when either switch is on. Without the config block: the reply / note editor, as before.
+    var features = {editor_extras: true};
+    try {
+        var cfgEl = document.getElementById('mfsessentials-config');
+        if (cfgEl) {
+            features = JSON.parse(cfgEl.textContent).features || features;
+        }
+    } catch (e) {}
+
+    // A conversation shown in a frame inside a pop-up window (Kanban's Edit Card): fullscreen
+    // would only fill that small frame, so it is left out there. The split-view pane is no pop-up.
+    var inPopupFrame = false;
+    try {
+        inPopupFrame = !!(window.frameElement && window.frameElement.closest('.modal'));
+    } catch (e) {}
 
     // Insert by name, after the button they belong with. Missing anchors (another module
     // changed the toolbar) just mean the button goes at the end of the first group.
-    window.fsAddFilter('conversation.editor_toolbar', function (toolbar) {
+    function extendToolbar(toolbar, fullscreen) {
         if (!toolbar || !toolbar[0] || !Array.isArray(toolbar[0][1])) {
             return toolbar;
         }
@@ -336,7 +350,9 @@
         add('underline', ['strikethrough']);
         add('lists', ['mfslindent', 'mfsloutdent', 'mfslalign']);
         add('picture', ['hr']);
-        add('codeview', ['fullscreen']);
+        if (fullscreen && !inPopupFrame) {
+            add('codeview', ['fullscreen']);
+        }
         // Undo / Redo at the start of the same group: a group of their own takes a whole
         // toolbar row in a narrow conversation column (groups wrap as a whole).
         if (group.indexOf('undo') === -1) {
@@ -345,5 +361,49 @@
         var result = toolbar.slice(0);
         result[0] = [toolbar[0][0], group];
         return result;
+    }
+
+    if (features.editor_extras) {
+        window.fsAddFilter('editor.options', function (options) {
+            options.buttons = $.extend({}, options.buttons || {}, buttons);
+            return options;
+        });
+        window.fsAddFilter('conversation.editor_toolbar', function (toolbar) {
+            return extendToolbar(toolbar, true);
+        });
+    }
+
+    // Two editors start Summernote without core's filters: editing a note (core's editThread()
+    // passes the bare fs_conv_editor_toolbar to summernoteInit()) and Kanban's card window
+    // (the Kanban module calls .summernote() itself, with the toolbar cut off after 'codeview').
+    // They are recognised by their textarea and get the same buttons on a copy of the options;
+    // nothing global is changed. No fullscreen inside a pop-up window. Kanban's own
+    // attachment button stays off: attachments go on the card's conversation after saving.
+    // Core loads summernote.js after the module scripts (partials/editor), so this waits for
+    // document ready; both editors are only opened by a click.
+    $(function () {
+        var summernote = $.fn.summernote;
+        if (typeof summernote !== 'function' || !(features.editor_extras || features.kanban_editor)) {
+            return;
+        }
+        $.fn.summernote = function (options) {
+            if (options && typeof options === 'object' && this.length) {
+                var fullscreen = null;
+                if (features.editor_extras && this.is('.thread-editor')) {
+                    fullscreen = !this.closest('.modal').length;
+                } else if (features.kanban_editor && this.is('.kn-card-body')) {
+                    fullscreen = false;
+                }
+                if (fullscreen !== null) {
+                    var copy = $.extend({}, options);
+                    copy.buttons = $.extend({}, options.buttons || {}, buttons);
+                    copy.toolbar = extendToolbar(options.toolbar, fullscreen);
+                    var args = Array.prototype.slice.call(arguments);
+                    args[0] = copy;
+                    return summernote.apply(this, args);
+                }
+            }
+            return summernote.apply(this, arguments);
+        };
     });
 })();

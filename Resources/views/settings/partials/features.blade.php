@@ -7,7 +7,8 @@
         'mfsessentials_split_view'     => __('A "Split view" button above the ticket list: the list stays on the left and the conversation opens on the right. Each agent switches it on for themselves.'),
         'mfsessentials_status_filters' => __('Active / Pending / Closed checkboxes above the ticket list. Each agent\'s choice is remembered.'),
         'mfsessentials_list_columns'   => __('Sort the ticket list by Customer and Assigned To, and drag the column borders to change their width. Each agent\'s widths are remembered.'),
-        'mfsessentials_editor_extras'  => __('In the reply and note editor: Tab / Shift+Tab for sub-lists, indent and outdent, strikethrough, alignment, undo and redo, a horizontal line and fullscreen.'),
+        'mfsessentials_editor_extras'  => __('In the reply and note editor, also when editing a note: Tab / Shift+Tab for sub-lists, indent and outdent, strikethrough, alignment, undo and redo, a horizontal line and fullscreen.'),
+        'mfsessentials_kanban_editor'  => __('The same editor buttons in Kanban\'s New Card and Edit Card window. Attachments are added to the card\'s conversation after saving the card.'),
         'mfsessentials_emoji'          => __('An emoji and symbol picker in the reply and note editor.'),
         'mfsessentials_reactions'      => __('Emoji reactions on notes, so colleagues can respond without writing a note.'),
         'mfsessentials_convert'        => __('Convert a single email in a conversation to an internal note, and back.'),
@@ -23,6 +24,9 @@
                     {{ csrf_field() }}
 
                     @foreach (\Modules\MFSEssentials\Services\Features::SWITCHES as $mfseOption => $mfseLabel)
+                        @if (!\Modules\MFSEssentials\Services\Features::available($mfseOption))
+                            @continue
+                        @endif
                         <div class="form-group">
                             <label for="{{ $mfseOption }}" class="col-sm-3 control-label">{{ __($mfseLabel) }}</label>
                             <div class="col-sm-8">
