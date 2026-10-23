@@ -254,6 +254,7 @@ Still stuck? Contact us via [managedfreescout.com/contact-us](https://managedfre
 
 | Version | Released | What changed |
 | --- | --- | --- |
+| 1.4.2 | 23 Oct 2026 | In split view the hover hint of the customer panel's cog can be read; a conversation that leaves the list after you assign, close or delete it there no longer stays open on the right |
 | 1.4.1 | 19 Oct 2026 | With a reply or note open, the Assignee and Status menus open on top of the editor; in split view their hover hints show below the buttons |
 | 1.4.0 | 19 Oct 2026 | Fixed panels, split view, status filters, sortable and adjustable columns, editor extras; a switch per feature; the smiley button now sits with the other editor buttons |
 | 1.3.2 | 9 Oct 2026 | Printouts show no reaction buttons under notes; the module is now called MFS Essentials |

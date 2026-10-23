@@ -144,12 +144,14 @@
         }
         // The fixed header sits at the very top of the pane, so core's tooltips above its buttons
         // (Assignee, Status, ...) would open outside the frame: only the arrow showed. Show them
-        // below instead; Bootstrap reads the placement on every show.
+        // below instead; Bootstrap reads the placement on every show. Same for the customer
+        // panel's cog ("Settings") in the top right corner: there to the left, as its menu
+        // opens below it.
         if (window.jQuery) {
-            window.jQuery(document).on('show.bs.tooltip', '#conv-layout-header [data-toggle="tooltip"]', function () {
+            window.jQuery(document).on('show.bs.tooltip', '#conv-layout-header [data-toggle="tooltip"], #conv-layout-customer [data-toggle="tooltip"]', function () {
                 var tip = window.jQuery(this).data('bs.tooltip');
                 if (tip) {
-                    tip.options.placement = 'bottom';
+                    tip.options.placement = window.jQuery(this).closest('#conv-layout-customer').length ? 'left' : 'bottom';
                 }
             });
         }
@@ -802,9 +804,15 @@
     // Restore the agent's choice (saved per user).
     if (feature('split_view') && prefs.split === true) {
         setSplit(true, true);
+        // Only when it is still in the list: core's bulk actions (assign, status, delete) reload
+        // the page, and a conversation that left the list would otherwise come back in the pane.
         var openId = getParam('mfsl_open');
         if (openId && /^\d+$/.test(openId)) {
-            openConversation(openId, hrefFor(openId), false);
+            if (list.querySelector('tr.conv-row[data-conversation_id="' + openId + '"]')) {
+                openConversation(openId, hrefFor(openId), false);
+            } else {
+                setOpenParam(null, false);
+            }
         }
     }
 })();
