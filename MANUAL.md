@@ -25,7 +25,7 @@ MFS Essentials is made by Managed FreeScout (StackPros B.V.). It runs entirely i
 
 You need a self-hosted FreeScout, access to its files, and an MFS Essentials licence.
 
-- **FreeScout:** version 1.4.0 is tested with FreeScout 1.8.248.
+- **FreeScout:** version 1.4.2 is tested with FreeScout 1.8.248.
 - **File access:** FTP, SFTP or your hosting panel's file manager, to place the module in FreeScout's `Modules/` folder once.
 - **Admin account** in FreeScout, to activate the module and the licence.
 - **Licence:** €9 per year (excl. VAT) for one FreeScout installation, all agents included. Buy it on [managedfreescout.com/mfsessentials](https://managedfreescout.com/mfsessentials/).
@@ -102,6 +102,7 @@ Split view shows the ticket list on the left and the open conversation on the ri
 
 - Reply, add notes, assign and change the status in the right pane as usual. The list refreshes afterwards.
 - Drag the divider between the two halves to make the list wider or narrower.
+- Press Esc to close the conversation on the right.
 - Ctrl+click (Cmd+click on a Mac) still opens a conversation in a new browser tab.
 - Click **Split view** again to switch it off. Your choice and the divider position are remembered for you.
 - The **Split view** button appears on screens at least 1200 pixels wide.
@@ -117,6 +118,8 @@ The checkboxes **Active**, **Pending** and **Closed** above the ticket list show
 - Your choice is remembered for you and applies to every folder, until you change it.
 - At least one status always stays ticked.
 - The filters do not appear in folders that hold one kind of conversation anyway: Closed, Spam, Deleted and Drafts.
+- The filters also apply to FreeScout's own conversation list, which you can open next to a conversation.
+- Search results show FreeScout's normal list: no status filters, extra sorting, column widths or split view there.
 - The counts in the folder list are FreeScout's own and do not change with the filters.
 
 ## Sortable and adjustable columns
