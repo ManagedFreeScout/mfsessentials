@@ -1,6 +1,7 @@
 {
   "name": "stackpros/freescout-mfsessentials",
   "description": "FreeScout module — editor quality-of-life features (code-block wrap fix, emoji/symbols insertion, note reactions).",
+  "license": "AGPL-3.0-only",
   "authors": [
     {
       "name": "StackPros",
