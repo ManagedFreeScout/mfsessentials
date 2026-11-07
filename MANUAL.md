@@ -5,7 +5,7 @@
 
 ## What MFS Essentials does
 
-MFS Essentials adds nine everyday upgrades to FreeScout, for every agent in your helpdesk. An admin can switch each one on or off. This manual covers version 1.4.2.
+MFS Essentials adds nine everyday upgrades to FreeScout, for every agent in your helpdesk. An admin can switch each one on or off. This manual covers version 1.4.3.
 
 | Upgrade | What your team gets |
 | --- | --- |
@@ -25,7 +25,7 @@ MFS Essentials is made by Managed FreeScout (StackPros B.V.). It runs entirely i
 
 You need a self-hosted FreeScout, access to its files, and an MFS Essentials licence.
 
-- **FreeScout:** version 1.4.2 is tested with FreeScout 1.8.248.
+- **FreeScout:** version 1.4.3 is tested with FreeScout 1.8.248.
 - **File access:** FTP, SFTP or your hosting panel's file manager, to place the module in FreeScout's `Modules/` folder once.
 - **Admin account** in FreeScout, to activate the module and the licence.
 - **Licence:** €9 per year (excl. VAT) for one FreeScout installation, all agents included. Buy it on [managedfreescout.com/mfsessentials](https://managedfreescout.com/mfsessentials/).
@@ -259,6 +259,7 @@ Still stuck? Contact us via [managedfreescout.com/contact-us](https://managedfre
 
 | Version | Released | What changed |
 | --- | --- | --- |
+| 1.4.3 | 7 Nov 2026 | The module now includes its licence (AGPL-3.0) as a LICENSE file; new square module icon. No changes in how it works |
 | 1.4.2 | 23 Oct 2026 | Editing a note gets the same editor buttons as writing one; new switch Kanban card editor (only with the Kanban module): the same buttons in Kanban's New Card and Edit Card window; hover hints near the top of the page open below or beside their button instead of behind the top menu; in split view a conversation that leaves the list after you assign, close or delete it there no longer stays open on the right |
 | 1.4.1 | 19 Oct 2026 | With a reply or note open, the Assignee and Status menus open on top of the editor; in split view their hover hints show below the buttons |
 | 1.4.0 | 19 Oct 2026 | Fixed panels, split view, status filters, sortable and adjustable columns, editor extras; a switch per feature; the smiley button now sits with the other editor buttons |
