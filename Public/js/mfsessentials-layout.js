@@ -132,12 +132,32 @@
     // top of the frame, outside the frame (only the arrow showed). Only then it opens below,
     // or to the left in the customer panel, as the cog's menu opens below it. Bootstrap reads
     // the placement on every show, so a button further down keeps core's placement.
+    // Placed below, the tooltip of a dropdown button (status, assignee) lies on the first item
+    // of its open menu and takes the click (the single "Not Spam" item of a spam conversation
+    // could not be clicked). So no tooltip while its own dropdown is open, and the one shown
+    // on hover is hidden as the dropdown opens.
     var TOOLTIP_ROOM = 40;
+    var OPEN_DROPDOWN = '.btn-group.open, .dropdown.open';
     if (window.jQuery) {
-        window.jQuery(document).on('show.bs.tooltip', '[data-toggle="tooltip"]', function () {
+        window.jQuery(document).on('show.bs.dropdown', function (e) {
+            var $group = window.jQuery(e.target);
+            $group.find('[data-toggle="tooltip"]')
+                .addBack('[data-toggle="tooltip"]')
+                .add($group.parents('[data-toggle="tooltip"]'))
+                .each(function () {
+                    if (window.jQuery(this).data('bs.tooltip')) {
+                        window.jQuery(this).tooltip('hide');
+                    }
+                });
+        });
+        window.jQuery(document).on('show.bs.tooltip', '[data-toggle="tooltip"]', function (e) {
             var $el = window.jQuery(this);
             var tip = $el.data('bs.tooltip');
             if (!tip) {
+                return;
+            }
+            if ($el.closest(OPEN_DROPDOWN).length || $el.find(OPEN_DROPDOWN).length) {
+                e.preventDefault();
                 return;
             }
             if (tip.mfslPlacement === undefined) {
